@@ -25,8 +25,8 @@ const HAYSTACK = FLAT.map(function (e) {
 })
 const HAS_LATIN = /[a-z]/
 
-// 搜索排序用:A 级证据排最前,未知等级沉底
-const LEVEL_ORDER = { A: 0, B: 1, C: 2 }
+// 搜索排序用:A 级证据排最前,未知等级沉底(全站唯一一份等级权重)
+const LEVEL_WEIGHT = { A: 0, B: 1, C: 2 }
 
 // 除标题和说人话之外的正文部分,参与搜索与「朴素匹配」对照
 function restText(it) {
@@ -74,22 +74,35 @@ function levelOf(item) {
 }
 
 // 关键词匹配:标题 > 说人话 > 正文;按字段权重排序。
+// 拉丁查询用的小写正文副本:首次拉丁查询时构建一次,之后复用。
+// 用户连续输入英文关键词时,不再每次输入都把全部正文 toLowerCase 一遍。
+let LOWER_BODY = null
+function lowerBodies() {
+  if (!LOWER_BODY) {
+    LOWER_BODY = FLAT.map(function (e) {
+      return restText(e.item).toLowerCase()
+    })
+  }
+  return LOWER_BODY
+}
+
 function search(query, filter) {
   const q = String(query || '').trim().toLowerCase()
   const lowerBody = HAS_LATIN.test(q)
+  const wantLevel = filter && filter !== 'all' ? String(filter).toUpperCase() : ''
+  const bodies = lowerBody ? lowerBodies() : null
   const out = []
   for (let i = 0; i < FLAT.length; i++) {
     const e = FLAT[i]
     const it = e.item
-    if (filter && filter === 'A' && levelOf(it) !== 'A') continue
+    if (wantLevel && levelOf(it) !== wantLevel) continue
     if (!q) {
       out.push({ entry: e, hits: 0, field: '' })
       continue
     }
     const t = HAYSTACK[i].title
     const pl = HAYSTACK[i].plain
-    const raw = restText(it)
-    const b = lowerBody ? raw.toLowerCase() : raw
+    const b = lowerBody ? bodies[i] : restText(it)
     if (t.indexOf(q) !== -1) out.push({ entry: e, hits: 3, field: 'title' })
     else if (pl.indexOf(q) !== -1) out.push({ entry: e, hits: 2, field: 'plain' })
     else if (b.indexOf(q) !== -1) out.push({ entry: e, hits: 1, field: 'body' })
@@ -99,8 +112,8 @@ function search(query, filter) {
     if (y.hits !== x.hits) return y.hits - x.hits
     // ② 同样命中位置时,证据等级高的排前面 ——
     //    「可信」是这个产品的立身之本,不能让 C 级内容排在 A 级前面
-    const lx = LEVEL_ORDER[x.entry.item.level]
-    const ly = LEVEL_ORDER[y.entry.item.level]
+    const lx = LEVEL_WEIGHT[x.entry.item.level]
+    const ly = LEVEL_WEIGHT[y.entry.item.level]
     if (lx !== ly) return (lx === undefined ? 9 : lx) - (ly === undefined ? 9 : ly)
     // ③ 最后按 id 保证顺序稳定
     return x.entry.item.id < y.entry.item.id ? -1 : 1
@@ -110,40 +123,20 @@ function search(query, filter) {
 
 // ---- 「先看这几条」:用数据算,不靠人工挑 ----
 //
-// 筛选条件全部来自上游的成本标签,不是我们拍的:
-//   钱=0 · 时间=少 · 毅力=否 · 收益=大
-// 也就是「一分钱不花、不占时间、不用毅力、收益最大」——全库有 114 条符合。
-//
-// 排序:证据等级(A>B>C) → 口径(死亡率 > 金钱 > 时间 > 自由) → id
-// 取值时每章最多一条,保证覆盖不同生活领域,而不是全挤在第一章。
-// 这个榜单**可解释**:每条为什么排前面,点开就能看到成本标签和证据等级。
-
-const LEVEL_RANK = { A: 0, B: 1, C: 2 }
-const SCOPE_RANK = { '死亡率': 0, '金钱': 1, '时间': 2, '自由': 3 }
-
-function tagOf(it, key) {
-  const m = String(it.costTag || '').match(new RegExp(key + '=([^ ]+)'))
-  return m ? m[1] : ''
-}
-
-function isEasyPick(it) {
-  return tagOf(it, '钱') === '0' && tagOf(it, '时间') === '少' &&
-    tagOf(it, '毅力') === '否' && tagOf(it, '收益') === '大'
-}
+// 摸鱼指南的条目没有成本标签(上游只有成本散文),所以精选不按性价比筛,
+// 改按**证据等级**:A 级优先,每章最多一条保证覆盖不同工作场景。
+// 等级权重复用顶部的 LEVEL_WEIGHT。
+// 这个榜单同样**可解释**:每条为什么排前面,点开就能看到证据等级和来源。
 
 function easyPickCount() {
-  return FLAT.filter(function (e) { return isEasyPick(e.item) }).length
+  return FLAT.filter(function (e) { return levelOf(e.item) === 'A' }).length
 }
 
 function easyPicks(n) {
-  const pool = FLAT.filter(function (e) { return isEasyPick(e.item) })
-  pool.sort(function (a, b) {
-    const la = LEVEL_RANK[a.item.level]
-    const lb = LEVEL_RANK[b.item.level]
+  const pool = FLAT.slice().sort(function (a, b) {
+    const la = LEVEL_WEIGHT[levelOf(a.item)]
+    const lb = LEVEL_WEIGHT[levelOf(b.item)]
     if (la !== lb) return (la === undefined ? 9 : la) - (lb === undefined ? 9 : lb)
-    const sa = SCOPE_RANK[tagOf(a.item, '口径')]
-    const sb = SCOPE_RANK[tagOf(b.item, '口径')]
-    if (sa !== sb) return (sa === undefined ? 9 : sa) - (sb === undefined ? 9 : sb)
     return a.item.id < b.item.id ? -1 : 1
   })
   const out = []
@@ -162,28 +155,25 @@ function easyPicks(n) {
 // 被分享进来的人看完一条,只有「上一条 / 下一条 / 本章目录」= 全是章节内导航,
 // 既不知道这条属于什么体系,也没有「看更多同类」的出口,分享落地等于零转化。
 //
-// 复用 utils/topics.js 的标签(8 主题 × 6 人生阶段,34 章 100% 覆盖),零新数据:
-// 用本条所在章节的主题/阶段标签,去匹配**别的章节**里的条目。
-// 排序:先给「一分钱不花·不占时间·收益大」的,再按证据等级(A>B>C),最后按 id 保证稳定。
+// 复用 utils/topics.js 的主题标签(摸鱼 22 章 100% 覆盖),零新数据:
+// 用本条所在章节的主题标签,去匹配**别的章节**里的条目。
+// 排序:证据等级(A>B)优先,再按 id 保证稳定。
 function related(id, n) {
   const e = findItem(id)
   if (!e) return []
-  const mine = topics.topicsOf(e.sectionId).concat(topics.stagesOf(e.sectionId))
+  const mine = topics.topicsOf(e.sectionId)
   if (!mine.length) return []
   const pool = []
   for (let i = 0; i < FLAT.length; i++) {
     const c = FLAT[i]
     if (c.sectionId === e.sectionId) continue
-    const tags = topics.topicsOf(c.sectionId).concat(topics.stagesOf(c.sectionId))
+    const tags = topics.topicsOf(c.sectionId)
     if (!tags.some(function (t) { return mine.indexOf(t) !== -1 })) continue
     pool.push(c)
   }
   pool.sort(function (a, b) {
-    const ea = isEasyPick(a.item) ? 0 : 1
-    const eb = isEasyPick(b.item) ? 0 : 1
-    if (ea !== eb) return ea - eb
-    const la = LEVEL_RANK[a.item.level]
-    const lb = LEVEL_RANK[b.item.level]
+    const la = LEVEL_WEIGHT[levelOf(a.item)]
+    const lb = LEVEL_WEIGHT[levelOf(b.item)]
     if (la !== lb) return (la === undefined ? 9 : la) - (lb === undefined ? 9 : lb)
     return a.item.id < b.item.id ? -1 : 1
   })
@@ -213,7 +203,7 @@ function dateLabel(key) {
 }
 
 // 每日三条:一条太少形不成习惯。同一天固定同样三条,且来自不同章节。
-// 步长取 97(质数,与 675 互质),保证在全书里不重复地走一圈。
+// 步长取 97(质数,与 90 互质),保证在全书里不重复地走一圈。
 function dailyTriple(key) {
   const k = key || dateKey()
   const n = FLAT.length
@@ -307,7 +297,6 @@ module.exports = {
   easyPicks: easyPicks,
   easyPickCount: easyPickCount,
   related: related,
-  tagOf: tagOf,
   neighbor: neighbor,
   dailyIndex: dailyIndex,
   dailyEntry: dailyEntry,

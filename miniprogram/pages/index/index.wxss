@@ -1,5 +1,118 @@
-/* 首页:三幕式(今日 / 新手必看 / 怎么找)+ 搜索面板
+/* 首页:三幕式(今日 / 先看这几条 / 怎么找)+ 搜索面板
    版式规则:列表一律「扁平行 + 发丝线」,全页只有 .hero 一个浮起元素 */
+
+/* ===================================================================
+   开机品牌层 —— 冷启动一次:深海蓝底、呼吸头像、衬线书名、小鱼游过。
+   不是进度条(数据是本地 require,没有真实加载),是品牌的第一次露面。
+   点击任意处可跳过;onHide 时整层移除,切 tab 回来不再挡内容。
+   =================================================================== */
+
+.boot {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-strong);
+  color: #FFFFFF;
+  transition: opacity 0.45s ease;
+}
+
+.boot.out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 按下轻微收暗:整层是可点的(跳过),反馈要柔和,不能闪烁 */
+.boot:active {
+  opacity: 0.92;
+}
+
+@media (prefers-color-scheme: dark) {
+  .boot {
+    background: #0C1A26;
+  }
+}
+
+/* 头像背后的呼吸光圈:慢频、低透明,像水面下的光 */
+.boot-halo {
+  position: absolute;
+  width: 300rpx;
+  height: 300rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+  opacity: 0.08;
+  animation: boot-breath 1.9s ease-in-out infinite;
+}
+
+.boot-logo {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.35);
+  animation: boot-pop 0.55s ease-out both;
+}
+
+.boot-title {
+  position: relative;
+  margin-top: var(--space-6);
+  font-family: var(--font-display);
+  font-size: 44rpx;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  animation: boot-rise 0.5s ease-out 0.35s both;
+}
+
+.boot-sub {
+  position: relative;
+  margin-top: var(--space-3);
+  font-size: var(--fs-meta);
+  color: rgba(255, 255, 255, 0.78);
+  animation: boot-rise 0.5s ease-out 0.55s both;
+}
+
+/* 一条小鱼从左游到右,低透明不抢戏 */
+.boot-fish {
+  position: absolute;
+  bottom: 320rpx;
+  left: -60rpx;
+  color: rgba(255, 255, 255, 0.45);
+  animation: boot-swim 1.9s linear 0.2s infinite;
+}
+
+.boot-skip {
+  position: absolute;
+  bottom: calc(64rpx + env(safe-area-inset-bottom));
+  font-size: var(--fs-micro);
+  color: rgba(255, 255, 255, 0.45);
+  animation: boot-rise 0.5s ease-out 0.8s both;
+}
+
+@keyframes boot-pop {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes boot-rise {
+  from { opacity: 0; transform: translateY(14rpx); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes boot-breath {
+  0%, 100% { transform: scale(1);    opacity: 0.08; }
+  50%      { transform: scale(1.18); opacity: 0.14; }
+}
+
+@keyframes boot-swim {
+  from { transform: translateX(0); }
+  to   { transform: translateX(880rpx); }
+}
 
 .topbar {
   position: relative;
@@ -143,14 +256,38 @@
   color: var(--color-border-strong);
 }
 
-/* ---- 幕一 · 今日一条 ---- */
+/* ---- 幕一 · 今日一条:水面浮标 ---- */
+
+/* 今日卡直接用湖水青深底 —— 全页最重的一块颜色,第一眼就是它。
+   深色模式下用 primary-strong 再深一档,白字对比仍然够。 */
+.hero {
+  background: var(--color-primary);
+  box-shadow: 0 12rpx 32rpx rgba(23, 58, 52, 0.28);
+}
+
+@media (prefers-color-scheme: dark) {
+  .hero {
+    background: var(--color-primary-strong);
+  }
+}
+
+/* hero 里的小鱼眉标:tick 换成鱼,深底上用摸鱼橙,文字转白 */
+.hero-kicker {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.hero-kicker .fish {
+  margin-right: var(--space-3);
+  color: var(--color-accent);
+}
 
 .hero .t-title {
   margin-top: var(--space-3);
+  font-family: var(--font-display);
   font-size: var(--fs-display);
   font-weight: 600;
   line-height: 1.32;
-  color: var(--color-text-primary);
+  color: #FFFFFF;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -160,18 +297,18 @@
 .hero .meta {
   margin-top: var(--space-3);
   font-size: var(--fs-meta);
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .hero .meta .dot {
   margin: 0 var(--space-2);
-  color: var(--color-border-strong);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .hero .cost {
   margin-top: var(--space-1);
   font-size: var(--fs-meta);
-  color: var(--color-mark-ink);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* 分享入口。
@@ -202,7 +339,7 @@
   font-size: var(--fs-meta);
   font-weight: 600;
   line-height: 1;
-  color: var(--color-primary);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .share-visual .ic {
@@ -227,14 +364,15 @@
   border: none;
 }
 
-/* 卡片底部动作行:分享(文字)+ 换一条(唯一主按钮),右对齐、同一基线 */
+/* 卡片底部动作行:分享(文字)+ 换一条(唯一主按钮),右对齐、同一基线。
+   深底上分隔线转白,「换一条」用摸鱼橙 —— 行动点就该是最暖的那块 */
 .t-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   margin-top: var(--space-5);
   padding-top: var(--space-4);
-  border-top: 1rpx solid var(--color-rule);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.22);
 }
 
 .btn-shuffle {
@@ -245,8 +383,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-primary);
-  color: var(--color-on-primary);
+  background: var(--color-accent);
+  color: #FFFFFF;
   border-radius: var(--radius-pill);
   font-size: var(--fs-meta);
   font-weight: 600;
@@ -264,14 +402,17 @@
 }
 
 .btn-shuffle:active {
-  background: var(--color-primary-strong);
+  background: var(--color-accent-ink);
 }
 
 /* ---- 今天再看两条:无卡壳,直接接在今日卡下面(结构样式在 app.wxss) ---- */
 
-.more-list {
+.more-wave {
   margin: var(--space-5) var(--page-gutter) 0;
-  border-top: 1rpx solid var(--color-rule);
+}
+
+.more-list {
+  margin: 0 var(--page-gutter);
 }
 
 /* ---- 幕二 · 编辑推荐(编辑线 / 序号 / 行结构在 app.wxss) ---- */
@@ -315,11 +456,6 @@
   color: var(--color-border-strong);
 }
 
-.find-line .lbl2 {
-  font-size: var(--fs-meta);
-  color: var(--color-text-secondary);
-}
-
 .find-line .en-mini {
   margin-left: var(--space-3);
   font-size: var(--fs-micro);
@@ -351,11 +487,7 @@
   color: var(--color-primary);
 }
 
-.tag-chip-stage {
-  color: var(--color-text-secondary);
-}
-
-/* 章节:去卡片外壳,序号用陶土色两位补零 */
+/* 章节:去卡片外壳,序号用摸鱼橙两位补零 */
 .find-chapters {
   margin-top: var(--space-6);
 }
@@ -425,6 +557,10 @@
 
 .recent-card:last-child {
   margin-right: var(--page-gutter);
+}
+
+.recent-card:active {
+  background: var(--color-surface-2);
 }
 
 .rc-title {

@@ -1,9 +1,9 @@
 <view class="mask" wx:if="{{show}}" catchtouchmove="noop" bindtap="onClose">
   <view class="stack">
-    <!-- 卡片模式:纯 WXML/WXSS,文字任意字号都清晰,配色取自暖读令牌 -->
+    <!-- 卡片模式:纯 WXML/WXSS,文字任意字号都清晰,配色取自慢水令牌 -->
     <view class="card" wx:if="{{mode === 'card'}}">
       <view class="kicker">
-        <view class="tick"></view>
+        <image class="brand" src="/assets/brand.png" mode="aspectFill" />
         <text>{{title}}</text>
       </view>
 

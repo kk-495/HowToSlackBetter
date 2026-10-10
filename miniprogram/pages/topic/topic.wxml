@@ -1,6 +1,9 @@
+<!-- 主题 / 人生阶段落地页:标签身份 + 编辑体标题
+     点进来的第一秒就让用户知道自己看的是「主题」还是「人生阶段」 -->
 <view class="wrap" wx:if="{{!notFound}}">
   <view class="head">
-    <view class="kicker"><view class="tick"></view>按处境找</view>
+    <view class="kicker"><view class="tick"></view>{{tagTypeLabel}}</view>
+    <view class="tag-pill {{tagType}}">{{name}}</view>
     <view class="h-title">{{name}}</view>
     <view class="h-sub">{{desc}} · 覆盖 {{sections.length}} 章 {{count}} 条</view>
   </view>
@@ -8,7 +11,7 @@
   <!-- 条目直出:顶部先给「本主题先看这几条」 -->
   <block wx:if="{{picks.length}}">
     <view class="act-head">
-      <text class="zh">本主题先看这几条</text>
+      <text class="zh">先看这几条</text>
       <text class="en">Start here</text>
     </view>
     <view class="ed-pick">
@@ -50,7 +53,7 @@
   </view>
 
   <view class="foot">
-    想看全部 34 章?回首页「按章节读」。这部分内容按你选的处境筛出来,可能横跨多个章节。
+    想看全部 34 章？回首页「按章节读」。这部分内容按你选的处境筛出来，可能横跨多个章节。
   </view>
 </view>
 

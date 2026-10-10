@@ -116,17 +116,17 @@ Page({
   onShareAppMessage() {
     if (this.data.total) {
       return {
-        title: '我在《高性价比人生指南》收藏了 ' + this.data.total + ' 条实用建议',
+        title: '我在《高性价比摸鱼指南》收藏了 ' + this.data.total + ' 条实用建议',
         path: '/pages/favorite/favorite'
       }
     }
     return {
-      title: '高性价比人生指南:' + guide.itemCount() + ' 条,按性价比排好',
+      title: '高性价比摸鱼指南:' + guide.itemCount() + ' 条,按性价比排好',
       path: '/pages/index/index'
     }
   },
 
   onShareTimeline() {
-    return { title: '我在《高性价比人生指南》收藏了 ' + this.data.total + ' 条建议' }
+    return { title: '我在《高性价比摸鱼指南》收藏了 ' + this.data.total + ' 条建议' }
   }
 })

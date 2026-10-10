@@ -1,5 +1,5 @@
 /* 启动弹窗。组件样式与 app.wxss 隔离,配色与图标在这里自带一份,
-   值取自设计令牌「暖读 / Warm Read」(见 app.wxss 顶部变量块)。 */
+   值取自设计令牌「慢水 / Slow Water」(见 app.wxss 顶部变量块)。 */
 
 .mask {
   position: fixed;
@@ -13,7 +13,7 @@
   justify-content: center;
   padding: 0 48rpx;
   box-sizing: border-box;
-  background: rgba(42, 37, 32, 0.55);
+  background: rgba(13, 34, 50, 0.58);
 }
 
 .stack {
@@ -24,14 +24,13 @@
 }
 
 /* ---- 卡片模式 ---- */
-/* 配色逐像素取自原图 notice.png,不随深色模式改写 —— 用户要求配色也不改 */
+/* v3:深海蓝品牌色,与全站「慢水」体系一致;淡蓝对角渐变是水面暗示 */
 
 .card {
   width: 100%;
   box-sizing: border-box;
   padding: 44rpx 40rpx 40rpx;
-  /* 原图是很淡的对角渐变:右上偏淡紫,左下偏淡薄荷 */
-  background: linear-gradient(225deg, #EDEEFF 0%, #FFFFFF 45%, #F7FBFA 72%, #E8F9F3 100%);
+  background: linear-gradient(225deg, #DCE9F3 0%, #FFFFFF 45%, #EFF4F9 72%, #DFEBF3 100%);
   border-radius: 24rpx;
   box-shadow: 0 16rpx 48rpx rgba(27, 27, 31, 0.22);
 }
@@ -44,26 +43,14 @@
   color: #727277;
 }
 
-.tick {
-  position: relative;
-  width: 32rpx;
-  height: 32rpx;
+/* 品牌头像:圆形,替代原 tick 方块 —— 开篇第一眼就是品牌记忆 */
+.brand {
+  width: 44rpx;
+  height: 44rpx;
   margin-right: 12rpx;
-  background: #3451B2;
-  border-radius: 8rpx;
-}
-
-.tick::before {
-  content: '';
-  position: absolute;
-  left: 10rpx;
-  top: 7rpx;
-  width: 8rpx;
-  height: 14rpx;
-  border-right: 3rpx solid #FFFFFF;
-  border-bottom: 3rpx solid #FFFFFF;
-  transform: rotate(45deg);
-  box-sizing: border-box;
+  border-radius: 50%;
+  flex: none;
+  background: #E8EDF2;
 }
 
 .headline {
@@ -76,7 +63,7 @@
 }
 
 .headline .em {
-  color: #3451B2;
+  color: #1E5A8A;
 }
 
 .sub {
@@ -158,8 +145,8 @@
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-/* 刻意不做深色模式改写:这张卡片是设计图的 1:1 还原,
-   配色一旦跟着系统变,就不是原图了。遮罩本身够暗,不至于刺眼。 */
+/* 刻意不做深色模式改写:开篇卡是浅色水面质感,深色系统下遮罩够暗、卡片自发光,
+   保持与浅色一致的品牌记忆。 */
 
 /* 点击反馈:公告图可点跳转时压暗。遮罩不加 —— 点遮罩的反馈就是弹窗关闭本身 */
 .pic:active {

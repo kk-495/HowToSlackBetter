@@ -1,11 +1,36 @@
-/* 主题 / 人生阶段落地页:非 tabBar 页,条目直出 */
+/* 主题 / 人生阶段落地页:标签身份 + 编辑体标题
+   点进来的第一秒就让用户知道自己看的是「主题」还是「人生阶段」
+   非 tabBar 页 */
 
 .wrap {
   padding-top: var(--space-6);
 }
 
 .head {
-  padding: 0 var(--page-gutter);
+  padding: 0 var(--page-gutter) var(--space-5);
+}
+
+/* 标签药丸:主题是绿,人生阶段是陶土 —— 三权分立
+   用户从首页两排标签点进来,颜色要能对上 */
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 48rpx;
+  padding: 0 var(--space-4);
+  margin-top: var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+}
+
+.tag-pill.topic {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.tag-pill.stage {
+  background: var(--color-secondary-soft);
+  color: var(--color-secondary-ink);
 }
 
 .h-title {
@@ -39,4 +64,9 @@
   color: var(--color-text-secondary);
   word-break: normal;
   overflow-wrap: break-word;
+}
+
+/* 本页不是 tabBar 页,回顶按钮贴底 */
+.to-top {
+  bottom: calc(40rpx + env(safe-area-inset-bottom));
 }

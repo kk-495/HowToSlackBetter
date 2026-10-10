@@ -59,13 +59,14 @@ Page({
     recent: [],
     history: [],
     hotWords: HOT_WORDS,
-    // 按主题 / 按人生阶段找:34 章的标题是书的语言,这两排标签是用户的语言
+    // 按主题找:22 章的标题是书的语言,这排标签是用户的语言
     topicList: topics.TOPICS,
-    stageList: topics.STAGES,
     searchFocused: false,
     showTop: false,
     noticeShow: false,
-    notice: notice
+    notice: notice,
+    bootShow: true,      // 开机品牌层:冷启动显示,onReady 编排后揭幕
+    bootLeaving: false   // 揭幕过渡态(整层淡出)
   },
 
   onLoad() {
@@ -77,7 +78,7 @@ Page({
     share.enableShare()
     const key = guide.dateKey()
     const triple = guide.dailyTriple(key)
-    // 幕二只放前 3 条「新手必看」,其余交给精选页,首页不当瀑布流
+    // 幕二只放前 3 条「先看这几条」,其余交给发现页,首页不当瀑布流
     const picks = guide.easyPicks(10)
     this.setData({
       total: guide.itemCount(),
@@ -118,16 +119,34 @@ Page({
 
   onHide() {
     this.clearTimers()
+    // 切走就不再挡内容;开机层只在该次冷启动的可见期出现
+    if (this.data.bootShow) this.setData({ bootShow: false, bootLeaving: false })
   },
 
   onUnload() {
     this.clearTimers()
   },
 
+  onReady() {
+    // 开机品牌层编排:0.55s 头像落定 → 1.1s 开始揭幕 → 1.65s 移除 → 1.75s 弹窗
+    this._bootTimers = [
+      setTimeout(() => this.setData({ bootLeaving: true }), 1100),
+      setTimeout(() => this.setData({ bootShow: false }), 1650)
+    ]
+  },
+
+  // 点任意处跳过开机动画
+  skipBoot() {
+    if (this._bootTimers) { this._bootTimers.forEach(clearTimeout); this._bootTimers = null }
+    if (this.data.bootShow) this.setData({ bootShow: false, bootLeaving: false })
+  },
+
   clearTimers() {
     if (this._timer) { clearTimeout(this._timer); this._timer = null }
     if (this._settleTimer) { clearTimeout(this._settleTimer); this._settleTimer = null }
     if (this._blurTimer) { clearTimeout(this._blurTimer); this._blurTimer = null }
+    if (this._noticeTimer) { clearTimeout(this._noticeTimer); this._noticeTimer = null }
+    if (this._bootTimers) { this._bootTimers.forEach(clearTimeout); this._bootTimers = null }
   },
 
   // 自定义 tabBar 不会自动同步激活态,每个 tab 页都要在 onShow 里推一次
@@ -146,7 +165,7 @@ Page({
       if (ds.share === 'daily' && this.data.daily) {
         const it = this.data.daily.item
         return {
-          title: it.title + ' · 人生指南',
+          title: it.title + ' · 摸鱼指南',
           path: '/pages/detail/detail?id=' + encodeURIComponent(it.id)
         }
       }
@@ -154,18 +173,18 @@ Page({
     const q = this.data.query.trim()
     if (q && this.data.mode === 'search') {
       return {
-        title: '「' + q + '」在《人生指南》里有 ' + this.data.resultCount + ' 条',
+        title: '「' + q + '」在《摸鱼指南》里有 ' + this.data.resultCount + ' 条',
         path: '/pages/index/index'
       }
     }
     return {
-      title: '高性价比人生指南:' + guide.itemCount() + ' 条,按性价比排好',
+      title: '高性价比摸鱼指南:' + guide.itemCount() + ' 条,按性价比排好',
       path: '/pages/index/index'
     }
   },
 
   onShareTimeline() {
-    return { title: '高性价比人生指南:' + guide.itemCount() + ' 条实用建议' }
+    return { title: '高性价比摸鱼指南:' + guide.itemCount() + ' 条实用建议' }
   },
 
   // 今日一条卡片上的分享按钮要吃掉 tap,别让它冒泡到卡片去跳详情
@@ -183,9 +202,14 @@ Page({
 
   maybeShowNotice() {
     if (noticeShown) return
-    if (!notice.enabled || !notice.image) return
+    if (!notice.enabled) return
     noticeShown = true
-    this.setData({ noticeShow: true })
+    // 等开机动画收尾(约 1.6s)再弹,别让弹窗盖住入场。
+    // 注意:守卫只看 enabled,不看 image —— card 模式根本不读图,旧版 !notice.image 守卫会把弹窗整个吞掉。
+    this._noticeTimer = setTimeout(() => {
+      this._noticeTimer = null
+      this.setData({ noticeShow: true })
+    }, 1750)
   },
 
   onCloseNotice() {
@@ -343,7 +367,7 @@ Page({
     wx.switchTab({ url: '/pages/favorite/favorite' })
   },
 
-  // 新手必看 Top 10(用成本标签算出来的入门清单)。
+  // 先看这几条 Top 10(用证据等级算出来的入门清单)。
   //「发现」是 tabBar 页,必须用 switchTab,不能 navigateTo
   goPicks() {
     wx.switchTab({ url: '/pages/picks/picks' })

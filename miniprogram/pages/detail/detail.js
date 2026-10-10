@@ -252,7 +252,7 @@ Page({
   shareTitle() {
     const p = String(this.data.plain || '').trim()
     const t = p && p.length <= 44 ? p : this.data.title
-    return t + ' · 人生指南'
+    return t + ' · 摸鱼指南'
   },
 
   onShareAppMessage() {

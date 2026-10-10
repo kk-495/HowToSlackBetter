@@ -47,6 +47,7 @@ Page({
     this._all = guide.itemsOfSection(id).map(function (e) { return toRow(e, readMap) })
     this.setData({
       sectionId: id,
+      sectionNo: String(id).padStart(2, '0'),
       title: meta.title,
       total: this._all.length,
       items: this._all.slice(0, PAGE)
@@ -71,14 +72,14 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: this.data.title + ' · ' + this.data.total + ' 条 · 人生指南',
+      title: this.data.title + ' · ' + this.data.total + ' 条 · 摸鱼指南',
       path: '/pages/section/section?id=' + encodeURIComponent(this.data.sectionId)
     }
   },
 
   onShareTimeline() {
     return {
-      title: this.data.title + ' · 人生指南',
+      title: this.data.title + ' · 摸鱼指南',
       query: 'id=' + encodeURIComponent(this.data.sectionId)
     }
   },

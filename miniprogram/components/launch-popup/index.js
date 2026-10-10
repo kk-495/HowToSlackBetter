@@ -11,30 +11,28 @@ Component({
     widthRatio: { type: Number, value: 0.92 },
     link: { type: String, value: '' },
 
-    // card 模式的文案
-    // 卡片文案逐字取自用户提供的设计图,不做任何改写(用户明确要求)。
+    // card 模式的文案(v3 开篇卡)
+    // slogan「少一点无效忙碌,多留时间、精力与边界」逐字取自摸鱼指南(HowToSlackBetter)封面语。
     //
-    // ⚠️ 已知的审核风险(用户已知悉并选择保留,若被拒审优先改这三处):
-    //   · 「用最少的钱」含「最」,属绝对化用语
-    //   · 「换回寿命、金钱和自由」属效果承诺,且内容涉及健康与金钱
-    //   · 「1726 条原始文献链接」:已核实数字是真的(上游 34 章逐条统计 = 1713 个链接),
-    //      但**我们解析上游数据时把「来源」字段丢了**,所以小程序里现在看不到这些链接。
-    //      补上数据解析即可,不是虚假宣传。
-    title: { type: String, value: '高性价比人生指南' },
-    headline: { type: String, value: '用最少的钱、时间和精力，换回' },
-    headlineEm: { type: String, value: '寿命、金钱和自由' },
-    sub: { type: String, value: '长寿防病 · 急救 · 省钱理财 · 法律红线 · 失业兜底 · 恋爱婚育 · 出国 · 技能' },
+    // ⚠️ 已知的审核风险(若被拒审优先检查):
+    //   · 「时间、精力与边界」属收益描述,已避免效果承诺与绝对化用语(旧版「用最少的钱」已移除)
+    //   · 数字与 manifest 一致:90 条 / A 级 25 条 / 99 个链接,
+    //     均由 tools/parse-rest-book.js 从上游数据实测统计,不是拍出来的。
+    title: { type: String, value: '高性价比摸鱼指南' },
+    headline: { type: String, value: '少一点无效忙碌，多留' },
+    headlineEm: { type: String, value: '时间、精力与边界' },
+    sub: { type: String, value: '会议与异步 · 注意力 · 休假边界 · 情绪劳动 · 远程协作 · 工时排班 · 场景话术' },
     tags: { type: Array, value: [] }
   },
 
   data: {
     picWidth: 690, // 750 * 0.92
-    // 四个数字标签,顺序与配色均取自原图(色值是从 PNG 里逐像素取样的)
+    // 数字标签:与 data/sections/index.js 的 manifest 统计保持一致(测试守着)
     defaultTags: [
-      { text: '675 条建议', bg: '#DDE6F9', fg: '#4A64BB' },
-      { text: 'A 级证据 438 条', bg: '#E2F6F0', fg: '#18794E' },
-      { text: '1726 条原始文献链接', bg: '#F6F6F7', fg: '#64646A' },
-      { text: '可按性价比筛选', bg: '#F6F6F7', fg: '#64646A' }
+      { text: '90 条建议', bg: '#DEEAF3', fg: '#1E5A8A' },
+      { text: 'A 级证据 25 条', bg: '#DFEBF4', fg: '#1E5A8A' },
+      { text: '99 条原始文献链接', bg: '#F6F6F7', fg: '#64646A' },
+      { text: '可按证据等级筛选', bg: '#F6F6F7', fg: '#64646A' }
     ]
   },
 

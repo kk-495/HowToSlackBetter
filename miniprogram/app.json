@@ -9,7 +9,7 @@
     "pages/about/about"
   ],
   "window": {
-    "navigationBarTitleText": "人生指南",
+    "navigationBarTitleText": "高性价比摸鱼指南",
     "navigationBarBackgroundColor": "@navBgColor",
     "navigationBarTextStyle": "@navTxtStyle",
     "backgroundColor": "@bgColor",
@@ -18,7 +18,7 @@
   "tabBar": {
     "custom": true,
     "color": "#635B50",
-    "selectedColor": "#2E6B4C",
+    "selectedColor": "#175F92",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [

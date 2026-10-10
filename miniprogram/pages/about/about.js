@@ -18,12 +18,12 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: '高性价比人生指南:' + guide.itemCount() + ' 条,按性价比排好',
+      title: '高性价比摸鱼指南:' + guide.itemCount() + ' 条,按性价比排好',
       path: '/pages/index/index'
     }
   },
 
   onShareTimeline() {
-    return { title: '高性价比人生指南:' + guide.itemCount() + ' 条实用建议' }
+    return { title: '高性价比摸鱼指南:' + guide.itemCount() + ' 条实用建议' }
   }
 })

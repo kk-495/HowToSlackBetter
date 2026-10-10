@@ -8,12 +8,6 @@ const PICKS = 5            // 「本主题先看这几条」取前 5 条
 
 const LEVEL_RANK = { A: 0, B: 1, C: 2 }
 
-// 上游的成本标签:一分钱不花 · 不占时间 · 不用毅力 · 收益大
-function isEasy(it) {
-  return guide.tagOf(it, '钱') === '0' && guide.tagOf(it, '时间') === '少' &&
-    guide.tagOf(it, '毅力') === '否' && guide.tagOf(it, '收益') === '大'
-}
-
 function rowOf(e, no) {
   return {
     id: e.item.id,
@@ -62,19 +56,25 @@ Page({
       guide.itemsOfSection(sid).forEach(function (e) { entries.push(e) })
     })
 
-    // 顶部「本主题先看这几条」:同主题里按成本标签算出来的最省力条目
-    const easy = entries.filter(function (e) { return isEasy(e.item) })
-    easy.sort(function (a, b) {
+    // 顶部「本主题先看这几条」:同主题里证据等级最高的条目(A>B,再按 id 稳定)
+    const easy = entries.slice().sort(function (a, b) {
       const la = LEVEL_RANK[a.item.level]
       const lb = LEVEL_RANK[b.item.level]
       if (la !== lb) return (la === undefined ? 9 : la) - (lb === undefined ? 9 : lb)
       return a.item.id < b.item.id ? -1 : 1
     })
 
-    wx.setNavigationBarTitle({ title: tag.name + ' · 人生指南' })
+    // 判断标签类型:主题 / 人生阶段 —— 摸鱼指南无阶段标签,恒为主题
+    const isStage = topics.STAGES.some(function (s) { return s.id === id })
+    const tagType = isStage ? 'stage' : 'topic'
+    const tagTypeLabel = isStage ? '人生阶段' : '按主题'
+
+    wx.setNavigationBarTitle({ title: tag.name + ' · 摸鱼指南' })
     this._all = entries.map(function (e) { return rowOf(e) })
     this.setData({
       tagId: id,
+      tagType: tagType,
+      tagTypeLabel: tagTypeLabel,
       name: tag.name,
       desc: tag.desc,
       count: entries.length,
@@ -114,14 +114,14 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: this.data.name + ':' + this.data.count + ' 条实用建议 · 人生指南',
+      title: this.data.name + ':' + this.data.count + ' 条实用建议 · 摸鱼指南',
       path: '/pages/topic/topic?id=' + encodeURIComponent(this.data.tagId)
     }
   },
 
   onShareTimeline() {
     return {
-      title: this.data.name + ' · 人生指南',
+      title: this.data.name + ' · 摸鱼指南',
       query: 'id=' + encodeURIComponent(this.data.tagId)
     }
   }

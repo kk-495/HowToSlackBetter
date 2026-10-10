@@ -1,8 +1,11 @@
+<!-- 章节页:大序号 + 编辑体标题
+     章节号是全书的骨架,在页头给足视觉分量,让用户知道自己在哪 -->
 <view class="wrap">
   <view class="sec-head">
-    <view class="kicker"><view class="tick"></view>章节</view>
+    <view class="kicker"><view class="tick"></view>第 {{sectionNo}} 章</view>
+    <view class="sec-num">{{sectionNo}}</view>
     <view class="sec-title">{{title}}</view>
-    <view class="sec-sub">共 {{total}} 条<text wx:if="{{items.length < total}}"> · 已显示 {{items.length}} 条,继续下滑加载</text></view>
+    <view class="sec-sub">共 {{total}} 条<text wx:if="{{items.length < total}}"> · 已显示 {{items.length}} 条，继续下滑加载</text></view>
   </view>
 
   <view class="ed-list">
@@ -17,13 +20,13 @@
         <text class="badge {{item.level === 'A' ? 'a' : (item.level === 'B' ? 'b' : 'c')}}">{{item.level}}</text>
         <view class="ei-title">{{item.title}}</view>
       </view>
-      <view class="ei-sub">性价比{{item.tier}} · {{item.sourceCount}} 条来源<text wx:if="{{item.read}}" class="read-tag"> · 已读</text></view>
+      <view class="ei-sub"><text wx:if="{{item.tier}}">性价比{{item.tier}} · </text>{{item.sourceCount}} 条来源<text wx:if="{{item.read}}" class="read-tag"> · 已读</text></view>
       <view class="plain" wx:if="{{item.plain}}">{{item.plain}}</view>
     </view>
   </view>
 
   <view class="footer">
-    {{title}} · 共 {{total}} 条<br/>内容源自开源项目《高性价比人生指南》(Unlicense 公有领域)
+    {{title}} · 共 {{total}} 条<br/>内容源自开源项目《高性价比摸鱼指南》(CC BY 4.0)
   </view>
 </view>
 

@@ -1,8 +1,14 @@
+<!-- 发现(tabBar 页):先看这几条 Top 10 + 今天再看两条
+     头部用大 "Top 10" 作为视觉锚点,底部说明用编辑体风格 -->
 <view class="wrap with-tabbar">
   <view class="head">
     <view class="kicker"><view class="tick"></view>发现 · 编辑推荐</view>
-    <view class="h-title">新手必看 Top 10</view>
-    <view class="h-sub">全库有 {{total}} 条符合「一分钱不花 · 不占时间 · 不用毅力 · 收益最大」。这里按证据等级从中挑了 {{n}} 条,每章最多一条,尽量覆盖不同的生活领域。</view>
+    <view class="top-num">Top {{n}}</view>
+    <view class="h-title">先看这几条</view>
+    <view class="h-sub">
+      全库 {{total}} 条 A 级证据。
+      这里按证据等级从中挑了 {{n}} 条，每章最多一条，尽量覆盖不同的工作场景。
+    </view>
   </view>
 
   <view class="ed-pick">
@@ -40,7 +46,11 @@
     </view>
   </view>
 
-  <view class="foot">
-    筛选条件全部来自原书的成本标签,不是我们挑的。每一条为什么排在这里,点开就能看到它的成本、收益和出处。
+  <!-- 底部说明:用发丝线 + 眉标,像杂志的编者按 -->
+  <view class="foot-note">
+    <view class="kicker"><view class="tick"></view>编者按</view>
+    <view class="foot-text">
+      筛选与排序全部来自上游的证据等级，不是我们挑的。每一条为什么排在这里，点开就能看到它的依据和出处。
+    </view>
   </view>
 </view>

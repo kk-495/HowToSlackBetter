@@ -1,12 +1,16 @@
 {
   "compileType": "miniprogram",
   "libVersion": "3.4.10",
-  "appid": "wx11810edf793c6cea",
+  "appid": "wx8b6b52ce8fad7277",
   "projectname": "high-score-life-guide",
   "packOptions": {
     "ignore": [
       {
         "value": "tests",
+        "type": "folder"
+      },
+      {
+        "value": "tools",
         "type": "folder"
       },
       {
@@ -23,7 +27,7 @@
     "minified": true,
     "compileWorklet": false,
     "uglifyFileName": false,
-    "uploadWithSourceMap": true,
+    "uploadWithSourceMap": false,
     "packNpmManually": false,
     "packNpmRelationList": [],
     "minifyWXSS": true,
@@ -42,5 +46,6 @@
     "tabIndent": "insertSpaces",
     "tabSize": 2
   },
-  "simulatorPluginLibVersion": {}
+  "simulatorPluginLibVersion": {},
+  "isGameTourist": false
 }

@@ -1,57 +1,60 @@
 /* ===================================================================
-   暖读 / Warm Read — 全局设计令牌与公共样式（v2：去 AI 味）
-   令牌来源:.workbuddy-ai/design/phase2-design-system.md §10
-            + deliverables/gstack/redesign-ui-2026-10-09.md §3（v2 增量）
+   慢水 / Slow Water — 全局设计令牌与公共样式（v3:高性价比摸鱼指南）
+   前身:暖读 v2(编辑体)。v3 把「摸鱼」翻译成视觉:水、波、鱼、泡。
+   定位:只讲摸鱼——把该交付的交付好,把不必消耗的精力省下来。
 
    约定:全站颜色/间距/圆角/阴影/字号只从下面这组变量取值,不要在页面里硬编码 HEX。
-   
-   v2 三条硬规则(去「模板感」的根):
-     ① 三权分立 —— 绿只给可交互;陶土赭只做编辑标记;琥珀金几乎不用
-     ② 字号从 12 档收到 6 档,并拉开顶部对比
-     ③ 全站只留 1 档阴影;卡片默认不再浮起(浮起是稀缺资源)
+
+   v3 三条硬规则:
+     ① 湖水青只给可交互与品牌;摸鱼橙只做编辑强调(眉标/序号/行动点);暖赭只留给「说人话」块
+     ② 字号 6 档不变;新增 --font-display 衬线标题字,正文依旧 sans
+     ③ 阴影仍只 1 档;浮起仍是稀缺资源(今日卡 / 浮层 / 回顶)
    =================================================================== */
 
 page {
-  /* ---- 品牌色 ---- */
-  --color-primary:        #2E6B4C;
-  --color-primary-strong: #245440;
-  --color-primary-soft:   #E8F1EB;
-  --color-on-primary:     #FFFFFF;   /* 主色上的字(暗色下必须翻深,否则白字只有 2.6:1) */
+  /* ---- 品牌色:深海蓝(用户要求去绿) ---- */
+  --color-primary:        #1E5A8A;
+  --color-primary-strong: #164669;
+  --color-primary-soft:   #DFEBF4;
+  --color-on-primary:     #FFFFFF;   /* 主色上的字(暗色下用白,对比达标) */
   --color-secondary:      #A8623A;
   --color-secondary-ink:  #8F5227;
   --color-secondary-soft: #F6ECE3;
-  --color-accent:         #C08A2E;
-  --color-accent-ink:     #8A6117;
-  --color-accent-soft:    #FBF1DC;
+  --color-accent:         #D96F32;   /* 摸鱼橙:鱼、行动点、强调 */
+  --color-accent-ink:     #A34E1D;
+  --color-accent-soft:    #FBEADF;
 
-  /* ---- 编辑标记(陶土赭的语义别名):眉标、编辑线、章节序号 ---- */
-  --color-mark:           #A8623A;
-  --color-mark-ink:       #8F5227;
+  /* ---- 编辑标记(摸鱼橙的语义别名):眉标、编辑线、章节序号 ---- */
+  --color-mark:           #C05F2A;
+  --color-mark-ink:       #9A4A1E;
 
-  /* ---- 语义色(同时承载证据等级 A/B/C) ---- */
-  --color-success:      #2E7D4F;
-  --color-success-soft: #E7F2EA;
+  /* ---- 语义色(A 级徽标跟主色走蓝;全站无绿) ---- */
+  --color-success:      #2470A0;
+  --color-success-soft: #E1EEF6;
   --color-warning:      #A86B00;
   --color-warning-soft: #FBF0DA;
   --color-danger:       #C43D2E;
   --color-danger-soft:  #FBE9E6;
-  --color-info:         #2F6B8F;
-  --color-info-soft:    #E7F0F5;
+  --color-info:         #2E6D8C;
+  --color-info-soft:    #E4EFF4;
 
-  /* ---- 中性 / 背景 / 描边 ---- */
-  --color-bg:            #FAF7F2;
-  --color-surface:       #FFFFFF;
-  --color-surface-2:     #F3EEE6;
-  --color-border:        #E9E2D6;
-  --color-border-strong: #D8CEBD;
+  /* ---- 中性 / 背景 / 描边:纸面换成水雾蓝灰 ---- */
+  --color-bg:            #EAF0F4;
+  --color-surface:       #FCFDFE;
+  --color-surface-2:     #E2EAF0;
+  --color-border:        #D4DFE7;
+  --color-border-strong: #B2C5D2;
   /* 发丝线:列表/区块的分隔语义别名,永远 1rpx */
-  --color-rule:          #E9E2D6;
+  --color-rule:          #D4DFE7;
 
-  /* ---- 文字三级 + 占位 ---- */
-  --color-text-primary:     #2A2520;
-  --color-text-secondary:   #635B50;
-  --color-text-tertiary:    #857B6E;
-  --color-text-placeholder: #B0A79A;
+  /* ---- 文字三级 + 占位:墨蓝黑 ---- */
+  --color-text-primary:     #1B252D;
+  --color-text-secondary:   #4E5D68;
+  --color-text-tertiary:    #6B7B86;
+  --color-text-placeholder: #92A2AC;
+
+  /* ---- 标题衬线:手册的书卷气,只给大标题,正文保持 sans ---- */
+  --font-display: 'Songti SC', 'STSong', 'Noto Serif SC', 'SimSun', Georgia, serif;
 
   /* ---- 间距(4rpx 基准) + 三级节奏 ---- */
   --space-1: 4rpx;  --space-2: 8rpx;  --space-3: 12rpx;
@@ -76,7 +79,7 @@ page {
   --radius-pill:  999rpx;
 
   /* ---- 阴影:全站只留 1 档,只给「唯一浮起元素」(今日卡 / 浮层 / 回顶) ---- */
-  --shadow-hero: 0 8rpx 24rpx rgba(60,48,30,0.10);
+  --shadow-hero: 0 8rpx 24rpx rgba(15,40,60,0.14);
 
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue',
                'Source Han Sans SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
@@ -88,40 +91,39 @@ page {
 }
 
 /* ===== 深色模式(纯 CSS,零成本)=====
-   注意:深色下主色需整体提亮才能对暗底达标,不要把浅色令牌直接搬过来;
-   反过来,主色提亮后「主色上的字」必须转深 —— 这就是 --color-on-primary 存在的原因 */
+   注意:深色下主色整体提亮,「主色上的字」两种模式都用白(on-primary 恒为白) */
 @media (prefers-color-scheme: dark) {
   page {
-    --color-bg:               #1C1917;
-    --color-surface:          #262220;
-    --color-surface-2:        #2F2A27;
-    --color-border:           #3A3430;
-    --color-border-strong:    #4A423C;
-    --color-rule:             #3A3430;
-    --color-text-primary:     #F0EBE4;
-    --color-text-secondary:   #B6AC9F;
-    --color-text-tertiary:    #8A8073;
-    --color-text-placeholder: #6E655B;
-    --color-primary:          #5FA47C;
-    --color-primary-strong:   #4E8C67;
-    --color-primary-soft:     #23372C;
-    --color-on-primary:       #1C1917;
+    --color-bg:               #101920;
+    --color-surface:          #18232B;
+    --color-surface-2:        #212F39;
+    --color-border:           #2B3A45;
+    --color-border-strong:    #405663;
+    --color-rule:             #2B3A45;
+    --color-text-primary:     #E9EFF4;
+    --color-text-secondary:   #A6B6C1;
+    --color-text-tertiary:    #7A8B96;
+    --color-text-placeholder: #5A6B76;
+    --color-primary:          #4A94C4;
+    --color-primary-strong:   #3B7FAD;
+    --color-primary-soft:     #1C3140;
+    --color-on-primary:       #FFFFFF;
     --color-secondary:        #C98A5F;
     --color-secondary-ink:    #D89A6E;
-    --color-secondary-soft:   #3A2C22;
-    --color-mark:             #C98A5F;
-    --color-mark-ink:         #D89A6E;
-    --color-accent:           #D9A84E;
-    --color-accent-ink:       #E4BC6C;
-    --color-accent-soft:      #3A3120;
-    --color-success:          #5FA47C;
-    --color-success-soft:     #23372C;
+    --color-secondary-soft:   #33281F;
+    --color-mark:             #D98F5A;
+    --color-mark-ink:         #E3A372;
+    --color-accent:           #E58A4E;
+    --color-accent-ink:       #EF9F68;
+    --color-accent-soft:      #382719;
+    --color-success:          #5C9FD0;
+    --color-success-soft:     #1D3240;
     --color-warning:          #D2A048;
     --color-warning-soft:     #3A3120;
     --color-danger:           #E06B5C;
     --color-danger-soft:      #3E2622;
     --color-info:             #6FA6C8;
-    --color-info-soft:        #22333E;
+    --color-info-soft:        #1F3038;
     --shadow-hero:            0 8rpx 24rpx rgba(0,0,0,0.45);
   }
 }
@@ -182,8 +184,10 @@ page {
 }
 
 .act-head .zh {
+  font-family: var(--font-display);
   font-size: var(--fs-h2);
   font-weight: 600;
+  letter-spacing: 0.02em;
   color: var(--color-text-primary);
 }
 
@@ -210,6 +214,81 @@ page {
 @keyframes rise {
   from { opacity: 0; transform: translateY(8rpx); }
   to   { opacity: 1; transform: none; }
+}
+
+/* ===================================================================
+   慢水签名元素 —— 鱼 / 波 / 泡(v3 新增,全站纯 WXSS 零图片)
+   =================================================================== */
+
+/* 几何小鱼:椭圆身 + 三角尾 + 点眼。
+   身体和尾巴用 ::before/::after,眼睛用子元素 <view class="eye"/>,三件套齐了才是一条鱼 */
+.fish {
+  position: relative;
+  display: inline-block;
+  width: 36rpx;
+  height: 22rpx;
+  flex: none;
+}
+
+.fish::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 26rpx;
+  height: 22rpx;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+.fish::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-top: 7rpx solid transparent;
+  border-bottom: 7rpx solid transparent;
+  border-right: 12rpx solid currentColor;
+  transform: translateY(-50%);
+}
+
+.fish .eye {
+  position: absolute;
+  left: 6rpx;
+  top: 8rpx;
+  width: 5rpx;
+  height: 5rpx;
+  background: var(--color-surface);
+  border-radius: 50%;
+}
+
+/* 水波分隔线:一排半圆拱成的波纹,代替直线发丝线(只用于少数签名处,别滥用) */
+.wave-hair {
+  height: 10rpx;
+  background: radial-gradient(circle at 12rpx 0, transparent 9rpx, var(--color-rule) 9rpx, var(--color-rule) 11rpx, transparent 12rpx) repeat-x;
+  background-size: 24rpx 10rpx;
+}
+
+/* 泡泡:hero 卡里的三粒缓慢上浮的气泡,给「水面」一点生命。
+   用 on-primary:深青底上是白色气泡(浅色模式),深色模式亮青底上是深色气泡 */
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--color-on-primary);
+  opacity: 0.10;
+  animation: bubble-rise 7s ease-in infinite;
+  pointer-events: none;
+}
+
+.bubble.b2 { animation-duration: 9s; animation-delay: 2s; }
+.bubble.b3 { animation-duration: 11s; animation-delay: 4.5s; }
+
+@keyframes bubble-rise {
+  0%   { transform: translateY(0);      opacity: 0.10; }
+  70%  { opacity: 0.16; }
+  100% { transform: translateY(-72rpx); opacity: 0; }
 }
 
 /* ===================================================================
@@ -413,8 +492,8 @@ page {
 }
 
 .badge.a {
-  background: var(--color-success-soft);
-  color: var(--color-success);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
 }
 
 .badge.b {
@@ -544,7 +623,7 @@ page {
 
 /* 次按钮按下时必须自己接管 color。
    .btn.ghost(0-2-0)与 .btn:active(0-2-0)特异性相等,后写的赢且只改 background
-   → 按下时是「主色文字压在 primary-strong 上」,实测对比度只有 1.37:1(文字几乎消失)。
+   - 按下时会变成「主色文字压在 primary-strong 上」,实测对比度只有 1.37:1(文字几乎消失)。
    补一条特异性更高的 .btn.ghost:active(0-3-0),就不依赖书写顺序了。 */
 .btn.ghost:active {
   background: var(--color-primary-soft);

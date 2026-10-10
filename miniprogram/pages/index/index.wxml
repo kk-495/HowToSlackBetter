@@ -1,3 +1,18 @@
+<!-- 开机品牌层:冷启动一次。呼吸头像 + 衬线书名 + 一条小鱼游过,点击任意处进入 -->
+<view
+  class="boot {{bootLeaving ? 'out' : ''}}"
+  wx:if="{{bootShow}}"
+  catchtouchmove="noop"
+  bindtap="skipBoot"
+>
+  <view class="boot-halo"></view>
+  <image class="boot-logo" src="/assets/brand.png" mode="aspectFill" />
+  <view class="boot-title">高性价比摸鱼指南</view>
+  <view class="boot-sub">少一点无效忙碌 · 多留时间、精力与边界</view>
+  <view class="boot-fish"><view class="fish"><view class="eye"></view></view></view>
+  <view class="boot-skip">点击任意处进入</view>
+</view>
+
 <view class="topbar">
   <view class="search-wrap">
     <view class="searchbox">
@@ -107,19 +122,22 @@
   </view>
 </view>
 
-<!-- 首页:三幕式(今日 → 新手必看 → 怎么找) -->
+<!-- 首页:三幕式(今日 / 先看这几条 / 怎么找)+ 搜索面板 -->
 <view class="wrap with-tabbar" wx:else>
   <!-- 信任条:把「675 条建议 · 1713 条原始文献」从页脚提到首屏可见处 -->
   <view class="trust-line">
     <text class="tl-strong">{{total}} 条建议</text><text class="tl-dot">·</text>{{sourceCount}} 条原始文献<text class="tl-dot">·</text>每条都能查到出处
   </view>
 
-  <!-- 幕一 · 今日:全页唯一浮起元素 -->
+  <!-- 幕一 · 今日:全页唯一浮起元素。「水面浮标」:三粒慢泡 + 一条橙色小鱼 -->
   <view class="hero" data-id="{{daily.item.id}}" bindtap="goDetail">
-    <view class="kicker"><view class="tick"></view>今日一条 · {{todayLabel}}</view>
+    <view class="bubble" style="left: 62%; width: 14rpx; height: 14rpx;"></view>
+    <view class="bubble b2" style="left: 80%; width: 10rpx; height: 10rpx;"></view>
+    <view class="bubble b3" style="left: 46%; width: 8rpx; height: 8rpx;"></view>
+    <view class="kicker hero-kicker"><view class="fish"><view class="eye"></view></view><text>今日一条 · {{todayLabel}}</text></view>
     <view class="t-title">{{daily.item.title}}</view>
-    <view class="meta">{{daily.section}}<text class="dot">·</text>证据 {{daily.item.level}}<text class="dot">·</text>性价比 {{daily.item.tier}}</view>
-    <view class="cost">{{daily.item.costTag}}</view>
+    <view class="meta">{{daily.section}}<text class="dot">·</text>证据 {{daily.item.level}}<block wx:if="{{daily.item.tier}}"><text class="dot">·</text>性价比 {{daily.item.tier}}</block></view>
+    <view class="cost" wx:if="{{daily.item.costTag}}">{{daily.item.costTag}}</view>
 
     <!-- 两个动作放卡片底部:分享降为文字,换一条是唯一主按钮 -->
     <view class="t-actions">
@@ -142,7 +160,8 @@
     </view>
   </view>
 
-  <!-- 今天再看两条:一条太少形不成习惯,三条且来自不同章节 -->
+  <!-- 今天再看两条:一条太少形不成习惯,三条且来自不同章节。水波线压轴,水面感收尾 -->
+  <view class="wave-hair more-wave"></view>
   <view class="more-list" wx:if="{{dailyMore.length}}">
     <view
       class="more-row"
@@ -158,9 +177,9 @@
     </view>
   </view>
 
-  <!-- 幕二 · 新手必看 Top 10:用数据算出来的入门清单,解决「675 条不知道从哪开始」 -->
+  <!-- 幕二 · 先看这几条 Top 10:用数据算出来的入门清单,解决「90 条不知道从哪开始」 -->
   <view class="act-head">
-    <text class="zh">新手必看 Top 10</text>
+    <text class="zh">先看这几条</text>
     <text class="en">Editor's picks</text>
   </view>
   <view class="ed-pick">
@@ -178,7 +197,7 @@
       </view>
     </view>
   </view>
-  <view class="ed-more" bindtap="goPicks">查看全部 10 条,每条都写明成本与出处 ›</view>
+  <view class="ed-more" bindtap="goPicks">查看全部 10 条,只挑证据最硬的 ›</view>
 
   <!-- 最近在看(本地记录,不上传) -->
   <view class="row-head">
@@ -211,8 +230,6 @@
   <view class="find-group">
     <view class="find-line">
       <text class="lbl">按主题</text>
-      <text class="sep">/</text>
-      <text class="lbl2">按人生阶段</text>
     </view>
     <scroll-view class="tag-scroll" scroll-x>
       <view
@@ -223,21 +240,12 @@
         bindtap="goTopic"
       >{{item.name}}</view>
     </scroll-view>
-    <scroll-view class="tag-scroll" scroll-x>
-      <view
-        class="tag-chip tag-chip-stage"
-        wx:for="{{stageList}}"
-        wx:key="id"
-        data-id="{{item.id}}"
-        bindtap="goTopic"
-      >{{item.name}}</view>
-    </scroll-view>
   </view>
 
   <view class="find-group find-chapters">
     <view class="find-line">
       <text class="lbl">按章节</text>
-      <text class="en-mini">34 CHAPTERS · {{total}} NOTES</text>
+      <text class="en-mini">22 CHAPTERS · {{total}} NOTES</text>
     </view>
     <view class="sec-list">
       <view
@@ -257,7 +265,7 @@
   </view>
 
   <view class="footer">
-    内容源自开源项目《高性价比人生指南》(Unlicense 公有领域)<br/>仅作整理展示,不构成医疗、投资或法律建议
+    内容源自开源项目《高性价比摸鱼指南》(CC BY 4.0)<br/>仅作整理展示,不构成专业建议
   </view>
 </view>
 

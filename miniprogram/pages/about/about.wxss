@@ -1,92 +1,227 @@
-/* 关于页(非 tabBar 页:已从 tabBar 降级,入口在「我的」) */
+/* 关于页:编辑体版式,不再用卡片堆叠
+   每块内容用眉标 + 发丝线分隔,和全书的编辑语言统一
+   v2 原则:扁平行 + 发丝线,不用卡片外壳 */
 
 .wrap {
   padding-top: var(--space-6);
-  padding-bottom: var(--space-8);
+  padding-bottom: var(--space-9);
 }
 
-.feat {
-  position: relative;
-  padding-left: var(--space-6);
-  margin-bottom: var(--space-3);
-  font-size: var(--fs-body);
-  line-height: 1.7;
-  color: var(--color-text-primary);
+/* ---- 页头:直接落纸面,不用卡片外壳 ---- */
+
+.about-head {
+  padding: 0 var(--page-gutter);
 }
 
-.feat::before {
-  content: '';
-  position: absolute;
-  left: 6rpx;
-  top: 18rpx;
-  width: 12rpx;
-  height: 12rpx;
-  border-radius: 50%;
-  background: var(--color-primary);
+/* about 页头的小鱼眉标:tick 换成鱼,间距对齐 tick 规范 */
+.about-kicker .fish {
+  margin-right: var(--space-3);
+  color: var(--color-mark);
 }
 
-/* 长 URL 需要能断,但用 overflow-wrap 兜底即可,不用 break-all */
-.src {
-  display: block;
-  font-size: var(--fs-meta);
-  line-height: 1.7;
-  color: var(--color-text-secondary);
-  word-break: normal;
-  overflow-wrap: break-word;
-}
-
-/* ---- 怎么看这些内容 ---- */
-
-.how-label {
-  margin: var(--space-5) 0 var(--space-3);
-  font-size: var(--fs-meta);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.how-label:first-of-type {
+.ah-title {
   margin-top: var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--fs-display);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
 }
 
-.how-body {
-  font-size: var(--fs-meta);
+.ah-sub {
+  margin-top: var(--space-4);
+  font-size: var(--fs-body);
   line-height: 1.75;
   color: var(--color-text-secondary);
   word-break: normal;
   overflow-wrap: break-word;
 }
 
-.lv {
+/* 发丝线:区块之间的分隔 */
+.about-hair {
+  margin: var(--space-section) var(--page-gutter) 0;
+}
+
+/* ---- 每个区块 ---- */
+
+.about-sec {
+  padding: 0 var(--page-gutter);
+  margin-top: var(--space-section);
+}
+
+/* ---- 特点:项目符号 + 扁平行 ---- */
+
+.feat-list {
+  margin-top: var(--space-4);
+}
+
+.feat-row {
   display: flex;
-  align-items: center;
-  margin-bottom: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-3) 0;
+  border-bottom: 1rpx solid var(--color-rule);
 }
 
-.lv-b {
+.feat-row:last-child {
+  border-bottom: none;
+}
+
+.feat-dot {
   flex: none;
-  width: 44rpx;
-  height: 44rpx;
-  margin-right: var(--space-3);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  /* 证据「印章」:方角,像钢印 */
-  border-radius: var(--radius-stamp);
-  font-size: var(--fs-micro);
-  font-weight: 600;
-  color: var(--color-on-primary);
+  width: 10rpx;
+  height: 10rpx;
+  margin: 16rpx var(--space-4) 0 4rpx;
+  background: var(--color-primary);
+  border-radius: 50%;
 }
 
-.lv-b.a { background: var(--color-primary); }
-.lv-b.b { background: var(--color-accent); }
-.lv-b.c { background: var(--color-text-tertiary); }
-
-.lv-t {
+.feat-body {
   flex: 1;
   min-width: 0;
+}
+
+.feat-t {
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.feat-m {
+  margin-top: var(--space-1);
   font-size: var(--fs-meta);
   line-height: 1.6;
   color: var(--color-text-secondary);
+}
+
+/* ---- 怎么看:证据等级 ---- */
+
+.how-title {
+  margin-top: var(--space-3);
+  font-size: var(--fs-h1);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+}
+
+.lv-row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) 0;
+  border-bottom: 1rpx solid var(--color-rule);
+}
+
+.lv-row:last-of-type {
+  border-bottom: none;
+}
+
+.lv-badge {
+  flex: none;
+  width: 52rpx;
+  height: 52rpx;
+  margin-right: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 证据印章:方,像钢印 */
+  border-radius: var(--radius-stamp);
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.lv-badge.a {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.lv-badge.b {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.lv-badge.c {
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+}
+
+.lv-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.lv-t {
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.lv-m {
+  margin-top: var(--space-1);
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* 性价比 + 来源:两个说明块 */
+.how-block {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1rpx solid var(--color-rule);
+}
+
+.how-label {
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-mark-ink);
+  margin-bottom: var(--space-2);
+}
+
+.how-body {
+  font-size: var(--fs-body);
+  line-height: 1.75;
+  color: var(--color-text-primary);
   word-break: normal;
   overflow-wrap: break-word;
+}
+
+/* ---- 数据来源 ---- */
+
+.src-title {
+  margin-top: var(--space-3);
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.src-line {
+  margin-top: var(--space-4);
+}
+
+.src-name {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.src-url {
+  display: block;
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-meta);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  word-break: normal;
+  overflow-wrap: break-word;
+  font-family: var(--font-mono, monospace);
+}
+
+/* ---- 页脚 ---- */
+
+.footer {
+  margin-top: var(--space-section);
 }

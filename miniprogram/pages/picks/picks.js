@@ -61,13 +61,13 @@ Page({
   onShareAppMessage() {
     const top = this.data.list[0]
     return {
-      title: plainOf(top, top && top.title ? top.title : '新手必看 Top 10') + ' · 人生指南',
+      title: plainOf(top, top && top.title ? top.title : '先看这几条 Top 10') + ' · 摸鱼指南',
       path: '/pages/picks/picks'
     }
   },
 
   onShareTimeline() {
     const top = this.data.list[0]
-    return { title: plainOf(top, '新手必看 Top 10') + ' · 人生指南' }
+    return { title: plainOf(top, '先看这几条 Top 10') + ' · 摸鱼指南' }
   }
 })

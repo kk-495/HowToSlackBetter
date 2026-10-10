@@ -43,17 +43,20 @@ const linkCount = data.sections.reduce((n, s) => n + s.items.reduce((m, i) => m 
 const entryCount = data.sections.reduce((n, s) => n + s.items.reduce((m, i) => m + i.source.length, 0), 0)
 t('来源条目数与 manifest 一致', entryCount === data.meta.sourceCount, entryCount + ' vs ' + data.meta.sourceCount)
 t('来源链接数与 manifest 一致', linkCount === data.meta.linkCount, linkCount + ' vs ' + data.meta.linkCount)
-t('来源链接数 > 1700(这是核心差异点)', linkCount > 1700, linkCount)
-t('证据等级批注被保留而不是丢弃',
-  data.sections.reduce((n, s) => n + s.items.filter(i => i.levelNote).length, 0) === 5)
-t('成本标签可拆成胶囊', data.sections.every(s => s.items.every(i =>
-  typeof i.costTag === 'string' && i.costTag.split(/\s+/).filter(Boolean).length >= 4)))
+t('摸鱼来源全部带链接', linkCount === entryCount && linkCount === 99, linkCount + '/' + entryCount)
+t('证据等级批注:摸鱼指南无批注(字段保留为空)',
+  data.sections.reduce((n, s) => n + s.items.filter(i => i.levelNote).length, 0) === 0)
+t('成本标签可拆成胶囊(摸鱼指南无成本标签,跳过)',
+  data.sections.every(s => s.items.every(i =>
+    !(typeof i.costTag === 'string' && i.costTag.length) ||
+    i.costTag.split(/\s+/).filter(Boolean).length >= 4)))
 
 const LEVELS = {}
 const TIERS = {}
 data.sections.forEach(s => s.items.forEach(i => { LEVELS[i.level] = (LEVELS[i.level] || 0) + 1; TIERS[i.tier] = (TIERS[i.tier] || 0) + 1 }))
-t('level 仅含 A/B/C', ['A', 'B', 'C'].join() === Object.keys(LEVELS).join(), JSON.stringify(LEVELS))
-t('tier 仅含 极高/高/一般', ['极高', '高', '一般'].join() === Object.keys(TIERS).join(), JSON.stringify(TIERS))
+t('level 仅含 A/B(摸鱼指南上游只分两档)', Object.keys(LEVELS).sort().join() === 'A,B', JSON.stringify(LEVELS))
+t('tier 仅含 极高/高/一般(空值=摸鱼指南条目,无性价比分级)',
+  Object.keys(TIERS).every(k => k === '' || ['极高', '高', '一般'].indexOf(k) !== -1), JSON.stringify(TIERS))
 
 const maxLen = data.sections.reduce((m, s) => s.items.reduce((n, i) => Math.max(n, (i.benefit || '').length + (i.note || '').length), m), 0)
 t('单条最长正文 < 20000 字(不炸渲染)', maxLen < 20000, 'maxLen=' + maxLen)
@@ -78,11 +81,11 @@ t('findItem 未命中返回 null', guide.findItem('nope-999') === null)
 const empty = guide.search('', null)
 t('空查询返回全部', empty.length === data.meta.count, empty.length)
 
-const kw = guide.search('安全带', null)
-t('关键词「安全带」有结果', kw.length > 0)
+const kw = guide.search('会议', null)
+t('关键词「会议」有结果', kw.length > 0)
 t('关键词结果相关(含关键词)', kw.every(h => {
-  const s = [h.entry.item.title, h.entry.item.body, h.entry.item.plain].join('')
-  return s.indexOf('安全带') !== -1
+  const s = guide.searchText(h.entry.item)
+  return s.indexOf('会议') !== -1
 }))
 t('标题命中排在正文命中之前', (() => {
   const titleHit = kw.filter(h => h.field === 'title').length
@@ -98,20 +101,20 @@ t('无命中返回空数组', noHit.length === 0)
 
 const la = guide.search('', 'A')
 t('A 级筛选只剩 A', la.length === LEVELS.A && la.every(h => h.entry.item.level === 'A'), la.length + ' vs ' + LEVELS.A)
-t('筛选 + 关键词同时生效', guide.search('安全带', 'A').every(h => h.entry.item.level === 'A'))
+t('筛选 + 关键词同时生效', guide.search('四天工作周', 'A').every(h => h.entry.item.level === 'A'))
 
 // 搜索热路径优化后的正确性:中文查询不做 toLowerCase,必须与朴素全字段匹配结果一致
 ;(function () {
-  const q = '租房'
+  const q = '会议'
   const expect = guide.allItems().filter(function (e) {
     return guide.searchText(e.item).indexOf(q) !== -1
   }).length
   t('中文查询命中数与朴素匹配一致', guide.search(q, null).length === expect, guide.search(q, null).length + ' vs ' + expect)
-  const up = guide.search('NHTSA', null)
-  const low = guide.search('nhtsa', null)
+  const up = guide.search('Eurofound', null)
+  const low = guide.search('eurofound', null)
   t('拉丁查询大小写不敏感且结果一致', up.length === low.length && up.length > 0, up.length + ' / ' + low.length)
-  t('拉丁查询命中真实正文(NHTSA 出现在安全带条目)', low.length > 0 && low.every(function (h) {
-    return guide.searchText(h.entry.item).toLowerCase().indexOf('nhtsa') !== -1
+  t('拉丁查询命中真实正文(Eurofound 出现在工时条目)', low.length > 0 && low.every(function (h) {
+    return guide.searchText(h.entry.item).toLowerCase().indexOf('eurofound') !== -1
   }))
   t('空查询在两种分支下都返回全部', guide.search('', null).length === data.meta.count)
 })()
@@ -128,9 +131,9 @@ t('筛选 + 关键词同时生效', guide.search('安全带', 'A').every(h => h.
   t('多处命中切多段', multi.filter(s => s.hit).length === 2 && multi.map(s => s.text).join('') === '安全带 安全带')
 })()
 
-// ---- 3c. 章节内上一条/下一条 ----
+// ---- 3c. 章节内上一条/下一条(用第 3 章:7 条,足够测首/中/末) ----
 ;(function () {
-  const list = guide.itemsOfSection(1)
+  const list = guide.itemsOfSection(3)
   const first = guide.neighbor(list[0].item.id)
   t('首条无上一条', first && first.prev === null)
   t('首条有下一条', first && first.next && first.next.id === list[1].item.id)
@@ -140,7 +143,7 @@ t('筛选 + 关键词同时生效', guide.search('安全带', 'A').every(h => h.
   t('末条有上一条', last && last.prev && last.prev.id === list[list.length - 2].item.id)
   t('末条索引为 N/N', last.index === list.length)
   t('未知 id 返回 null', guide.neighbor('nope') === null)
-  t('neighbor 带 sectionId 且与章节一致', guide.neighbor(list[0].item.id).sectionId === 1)
+  t('neighbor 带 sectionId 且与章节一致', guide.neighbor(list[0].item.id).sectionId === 3)
   const sec = list[2].item
   const nb = guide.neighbor(sec.id)
   t('邻接条目 id 不重复', nb.prev.id !== nb.next.id && nb.prev.id !== sec.id && nb.next.id !== sec.id)
@@ -153,15 +156,21 @@ t('dateKey() 无参也能用', /^\d{4}-\d{2}-\d{2}$/.test(guide.dateKey()) && gu
 t('dateKey() 与今天一致', guide.dateKey() === guide.dateKey(new Date()))
 t('dateKey 传 Date 正确', guide.dateKey(new Date(2026, 9, 8)) === '2026-10-08')
 t('dateKey 传字符串正确', guide.dateKey('2026-10-08T23:30:00') === '2026-10-08')
-t('同一天索引稳定', guide.dailyIndex(675, k1) === guide.dailyIndex(675, k1))
-t('不同天索引不同', guide.dailyIndex(675, k1) !== guide.dailyIndex(675, k2))
-t('索引在范围内', guide.dailyIndex(675, k1) >= 0 && guide.dailyIndex(675, k1) < 675)
+const N = guide.itemCount()
+t('同一天索引稳定', guide.dailyIndex(N, k1) === guide.dailyIndex(N, k1))
+t('索引在范围内', guide.dailyIndex(N, k1) >= 0 && guide.dailyIndex(N, k1) < N)
 t('dailyEntry 返回条目', guide.dailyEntry(k1) && guide.dailyEntry(k1).item.id)
-t('dailyEntry 跨天会变', guide.dailyEntry(k1).item.id !== guide.dailyEntry(k2).item.id)
+// 单对日期可能撞索引(1/N 概率),相邻 7 天内必有两个不同条目才算"跨天会变"
+let entryVaries = false
+for (let i = 1; i <= 7 && !entryVaries; i++) {
+  const dk = guide.dateKey(new Date(2026, 9, 8 + i))
+  if (guide.dailyEntry(k1).item.id !== guide.dailyEntry(dk).item.id) entryVaries = true
+}
+t('dailyEntry 跨天会变(相邻 7 天内)', entryVaries)
 const kCover = new Set()
 for (let i = 0; i < 60; i++) {
   const d = new Date(2026, 0, 1 + i)
-  kCover.add(guide.dailyIndex(675, guide.dateKey(d)))
+  kCover.add(guide.dailyIndex(N, guide.dateKey(d)))
 }
 t('60 天内索引有分散(>30 种)', kCover.size > 30, kCover.size)
 
@@ -269,6 +278,13 @@ t('历史可清空', recent.list().length === 0)
     fs.existsSync(path.join(APP, 'custom-tab-bar', 'index.' + e))))
   t('custom-tab-bar 声明为组件', JSON.parse(
     fs.readFileSync(path.join(APP, 'custom-tab-bar', 'index.json'), 'utf8')).component === true)
+  // 自定义 tabBar 的列表必须与 app.json 逐项一致(页面按下标推 selected,脱节就乱跳)
+  const barSrc = fs.readFileSync(path.join(APP, 'custom-tab-bar', 'index.js'), 'utf8')
+  const barPaths = []
+  barSrc.replace(/pagePath:\s*'([^']+)'/g, (m, p) => { barPaths.push(p); return m })
+  t('custom-tab-bar 列表与 app.json 逐项一致',
+    JSON.stringify(barPaths.map(p => p.replace(/^\//, ''))) === JSON.stringify(tabs.map(x => x.pagePath)),
+    barPaths.join(','))
 
   // 深色模式
   t('app.json 开启 darkmode', appJson.darkmode === true)
@@ -328,7 +344,7 @@ t('历史可清空', recent.list().length === 0)
     })
   })
   t('没有用 navigateTo 打开 tabBar 页', badNav.length === 0, badNav.join(' | '))
-  t('tab 页 onShow 里同步了 tabBar 激活态', ['index', 'favorite', 'about'].every(f => {
+  t('tab 页 onShow 里同步了 tabBar 激活态', ['index', 'picks', 'favorite'].every(f => {
     const src = fs.readFileSync(path.join(APP, 'pages', f, f + '.js'), 'utf8')
     return src.indexOf('getTabBar') !== -1 && src.indexOf('selected') !== -1
   }))
@@ -406,7 +422,9 @@ t('历史可清空', recent.list().length === 0)
   })())
   const noticeCfg = require(path.join(APP, 'utils', 'notice.js'))
   t('弹窗模式合法', noticeCfg.mode === 'card' || noticeCfg.mode === 'image', noticeCfg.mode)
-  t('弹窗图片必须是包内路径,不能是外链', /^\/assets\//.test(noticeCfg.image))
+  // card 模式不读图,image 允许为空;一旦填了就必须是包内路径,不能是外链
+  t('弹窗图片必须是包内路径,不能是外链',
+    noticeCfg.image === '' || /^\/assets\//.test(noticeCfg.image))
   // 位图模式才需要那张图真的在包里 —— 否则用户开屏看到一张裂图
   t('位图模式下图片必须真实存在', (function () {
     if (!noticeCfg.enabled || noticeCfg.mode !== 'image') return true
@@ -421,24 +439,24 @@ t('历史可清空', recent.list().length === 0)
     const s = fs.readFileSync(path.join(APP, 'pages', 'index', 'index.js'), 'utf8')
     return /let noticeShown = false/.test(s) && s.indexOf('if (noticeShown) return') !== -1
   })())
-  // 卡片文案逐字照搬用户提供的设计图 —— 不允许被"顺手改好",有回归测试守着
+  // 开篇卡文案:v3 合订本(slogan 取自摸鱼指南封面,数字与 manifest 实测一致) —— 有回归测试守着
   const popupJs = fs.readFileSync(path.join(APP, 'components', 'launch-popup', 'index.js'), 'utf8')
   const COPY = [
-    '高性价比人生指南',
-    '用最少的钱、时间和精力，换回',
-    '寿命、金钱和自由',
-    '长寿防病 · 急救 · 省钱理财 · 法律红线 · 失业兜底 · 恋爱婚育 · 出国 · 技能',
-    '675 条建议',
-    'A 级证据 438 条',
-    '1726 条原始文献链接',
-    '可按性价比筛选'
+    '高性价比摸鱼指南',
+    '少一点无效忙碌，多留',
+    '时间、精力与边界',
+    '会议与异步 · 注意力 · 休假边界 · 情绪劳动 · 远程协作 · 工时排班 · 场景话术',
+    '90 条建议',
+    'A 级证据 25 条',
+    '99 条原始文献链接',
+    '可按证据等级筛选'
   ]
   t('弹窗卡片文案与原图逐字一致', COPY.every(function (s) { return popupJs.indexOf(s) !== -1 }),
     COPY.filter(function (s) { return popupJs.indexOf(s) === -1 }).join(' / '))
   t('弹窗文案的审核风险已在代码里标注',
     /审核风险/.test(popupJs) && /绝对化用语/.test(popupJs) && /效果承诺/.test(popupJs))
-  t('弹窗卡片用原图配色(不是暖读那套)',
-    /#3451B2/.test(fs.readFileSync(path.join(APP, 'components', 'launch-popup', 'index.wxss'), 'utf8')) &&
+  t('弹窗卡片用慢水品牌配色(与全站一致)',
+    /#1E5A8A/.test(fs.readFileSync(path.join(APP, 'components', 'launch-popup', 'index.wxss'), 'utf8')) &&
     /#1B1B1F/.test(fs.readFileSync(path.join(APP, 'components', 'launch-popup', 'index.wxss'), 'utf8')) &&
     /#66666C/.test(fs.readFileSync(path.join(APP, 'components', 'launch-popup', 'index.wxss'), 'utf8')))
   t('弹窗卡片配色不随深色模式改写',
@@ -481,7 +499,7 @@ t('历史可清空', recent.list().length === 0)
     })
   })())
   t('A 级筛选只返回 A 级', (function () {
-    const r = guide.search('钱', 'A')
+    const r = guide.search('四天工作周', 'A')
     return r.length > 0 && r.every(function (h) { return h.entry.item.level === 'A' })
   })())
 
@@ -531,8 +549,8 @@ t('历史可清空', recent.list().length === 0)
   // 页面标题也参与搜一搜匹配,每个页面都该带上词根且各不相同
   const titles = ['index', 'section', 'detail', 'favorite', 'about'].map(f =>
     JSON.parse(read('pages/' + f + '/' + f + '.json')).navigationBarTitleText)
-  t('每个页面标题都带「人生指南」词根',
-    titles.every(x => typeof x === 'string' && x.indexOf('人生指南') !== -1), titles.join(' | '))
+  t('每个页面标题都带「摸鱼指南」词根',
+    titles.every(x => typeof x === 'string' && x.indexOf('摸鱼指南') !== -1), titles.join(' | '))
   t('页面标题各不相同(覆盖更多搜索词)', new Set(titles).size === titles.length)
 
   // 死代码
@@ -609,11 +627,11 @@ t('历史可清空', recent.list().length === 0)
     read('pages/detail/detail.wxml').indexOf('能得什么') !== -1 &&
     read('pages/detail/detail.wxml').indexOf('要注意什么') !== -1)
 
-  // 关于页的授权与来源必须取自数据里的 meta —— 硬编码的那份迟早和数据对不上
+  // 关于页的授权与来源必须取自数据里的 meta.sources(两份开源项目分别署名) —— 硬编码的那份迟早和数据对不上
   t('关于页授权与来源取自 meta',
-    read('pages/about/about.wxml').indexOf('{{meta.license}}') !== -1 &&
-    read('pages/about/about.wxml').indexOf('{{meta.sourceUrl}}') !== -1 &&
-    read('pages/about/about.wxml').indexOf('github.com') === -1)
+    read('pages/about/about.wxml').indexOf('wx:for="{{meta.sources}}"') !== -1 &&
+    read('pages/about/about.wxml').indexOf('{{item.url}}') !== -1 &&
+    read('pages/about/about.wxml').indexOf('{{item.license}}') !== -1)
 
   // 今日一条的排版:分享按钮和成本信息挤一行会把成本压成每行 6 个字
   const idxWxml = read('pages/index/index.wxml')
@@ -685,12 +703,10 @@ t('历史可清空', recent.list().length === 0)
     read('pages/about/about.wxml').indexOf('怎么看这些内容') !== -1 &&
     read('pages/about/about.wxml').indexOf('证据等级') !== -1)
 
-  // ---- 主题 / 人生阶段标签 ----
+  // ---- 主题标签(摸鱼指南无人生阶段标签) ----
   const tp = require(path.join(APP, 'utils', 'topics.js'))
-  t('标签映射 100% 覆盖 34 章(主题与阶段都不漏)',
-    guide.sectionTitles().every(function (s) {
-      return tp.topicsOf(s.id).length > 0 && tp.stagesOf(s.id).length > 0
-    }))
+  t('主题标签覆盖全部 22 章',
+    guide.sectionTitles().every(function (s) { return tp.topicsOf(s.id).length > 0 }))
   t('每个标签都能查到章节', tp.TOPICS.concat(tp.STAGES).every(function (t) {
     return tp.sectionsOfTag(t.id).length > 0
   }))
@@ -698,22 +714,21 @@ t('历史可清空', recent.list().length === 0)
     const ids = tp.TOPICS.concat(tp.STAGES).map(function (t) { return t.id })
     return ids.filter(function (v, i) { return ids.indexOf(v) === i }).length === ids.length
   })())
-  t('标签指向的章节号都在 1..34 内', tp.TOPICS.concat(tp.STAGES).every(function (tag) {
-    return tp.sectionsOfTag(tag.id).every(function (n) { return n >= 1 && n <= 34 })
+  t('标签指向的章节号都在 1..22 内', tp.TOPICS.concat(tp.STAGES).every(function (tag) {
+    return tp.sectionsOfTag(tag.id).every(function (n) { return n >= 1 && n <= 22 })
   }))
-  t('首页有主题与人生阶段入口', idxWxml.indexOf('goTopic') !== -1 &&
-    idxWxml.indexOf('topicList') !== -1 && idxWxml.indexOf('stageList') !== -1)
+  t('首页有主题入口', idxWxml.indexOf('goTopic') !== -1 &&
+    idxWxml.indexOf('topicList') !== -1)
   t('标签页已注册进 app.json',
     JSON.parse(read('app.json')).pages.indexOf('pages/topic/topic') !== -1)
 
   // ---- 「先看这 10 条」:用数据算,不靠人工挑 ----
-  t('精选榜单的筛选条件来自成本标签', (function () {
+  t('精选榜单按证据等级排序(A 全部排在 B 前)', (function () {
     const p = guide.easyPicks(60)
-    return p.length > 0 && p.every(function (e) {
-      const it = e.item
-      return guide.tagOf(it, '钱') === '0' && guide.tagOf(it, '时间') === '少' &&
-        guide.tagOf(it, '毅力') === '否' && guide.tagOf(it, '收益') === '大'
-    })
+    const levels = p.map(function (e) { return e.item.level })
+    const firstB = levels.indexOf('B')
+    const lastA = levels.lastIndexOf('A')
+    return p.length > 0 && (firstB === -1 || lastA === -1 || lastA < firstB)
   })())
   t('精选 10 条每章最多一条(保证覆盖不同领域)', (function () {
     const p = guide.easyPicks(10)
@@ -723,10 +738,10 @@ t('历史可清空', recent.list().length === 0)
   t('精选榜首选 A 级证据', (function () {
     return guide.easyPicks(10).every(function (e) { return e.item.level === 'A' })
   })())
-  t('精选总数与实测一致(114 条)', guide.easyPickCount() === 114, guide.easyPickCount())
+  t('精选总数与实测一致(A 级 25 条)', guide.easyPickCount() === 25, guide.easyPickCount())
   t('首页有精选入口', idxWxml.indexOf('goPicks') !== -1 &&
     read('pages/index/index.js').indexOf('goPicks()') !== -1)
-  t('精选页解释了筛选规则(可解释性)', read('pages/picks/picks.wxml').indexOf('成本标签') !== -1)
+  t('精选页解释了筛选规则(可解释性)', read('pages/picks/picks.wxml').indexOf('证据等级') !== -1)
   // 收藏了却没理由回来 = 收藏夹坟墓,首页亮出数量是最低成本的回访钩子
   t('首页显示收藏数量(回访钩子)',
     /\{\{favCount/.test(idxWxml) && /refreshFavCount/.test(read('pages/index/index.js')))

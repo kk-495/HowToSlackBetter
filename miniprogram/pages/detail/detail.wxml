@@ -6,8 +6,7 @@
     <view class="d-meta">
       <text class="badge {{level === 'A' ? 'a' : (level === 'B' ? 'b' : 'c')}}">{{level}}</text>
       <text>证据 {{level}}<text wx:if="{{levelNote}}" class="lvl-note">（{{levelNote}}）</text></text>
-      <text class="dot">·</text>
-      <text>性价比 {{tier}}</text>
+      <block wx:if="{{tier}}"><text class="dot">·</text><text>性价比 {{tier}}</text></block>
     </view>
     <view class="chips" wx:if="{{costChips.length}}">
       <view class="chip-mini" wx:for="{{costChips}}" wx:key="*this">{{item}}</view>
@@ -118,7 +117,7 @@
   </view>
 
   <view class="footer">
-    内容源自开源项目《高性价比人生指南》(Unlicense 公有领域)<br/>仅作整理展示,不构成医疗、投资或法律建议
+    内容源自开源项目《高性价比摸鱼指南》(CC BY 4.0)<br/>仅作整理展示,不构成专业建议
   </view>
 </view>
 

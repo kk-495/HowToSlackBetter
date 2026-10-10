@@ -3,10 +3,10 @@
    不依赖 CSS 变量穿透;深色模式在组件内单独声明。 */
 
 .tabbar {
-  --tb-bg: #FFFFFF;
-  --tb-border: #E9E2D6;
-  --tb-text: #635B50;
-  --tb-active: #2E6B4C;
+  --tb-bg: #FCFDFE;
+  --tb-border: #D4DFE7;
+  --tb-text: #4E5D68;
+  --tb-active: #175F92;
 
   position: fixed;
   left: 0;
@@ -21,10 +21,10 @@
 
 @media (prefers-color-scheme: dark) {
   .tabbar {
-    --tb-bg: #262220;
-    --tb-border: #3A3430;
-    --tb-text: #B6AC9F;
-    --tb-active: #5FA47C;
+    --tb-bg: #18232B;
+    --tb-border: #2B3A45;
+    --tb-text: #A6B6C1;
+    --tb-active: #5C9FD0;
   }
 }
 
@@ -96,7 +96,8 @@
   background: currentColor;
 }
 
-.ic-info::before {
+/* 发现:罗盘 —— 外圈 + 中心菱形指针 */
+.ic-compass::before {
   content: '';
   position: absolute;
   left: 2rpx;
@@ -108,32 +109,43 @@
   box-sizing: border-box;
 }
 
-.ic-info::after {
+.ic-compass::after {
   content: '';
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 6rpx;
-  height: 6rpx;
+  width: 8rpx;
+  height: 8rpx;
+  background: currentColor;
+  border-radius: 1rpx;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* 我的:人像 —— 圆头 + 圆肩 */
+.ic-user::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 3rpx;
+  width: 10rpx;
+  height: 10rpx;
   background: currentColor;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
 }
 
-.ic-star::before {
-  content: '☆';
+.ic-user::after {
+  content: '';
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 32rpx;
-  height: 32rpx;
-  font-size: 32rpx;
-  line-height: 32rpx;
-  text-align: center;
-}
-
-.ic-star.on::before {
-  content: '★';
+  left: 50%;
+  top: 17rpx;
+  width: 18rpx;
+  height: 10rpx;
+  border: 3rpx solid currentColor;
+  border-bottom: none;
+  border-radius: 10rpx 10rpx 0 0;
+  box-sizing: border-box;
+  transform: translateX(-50%);
 }
 
 /* 点击反馈:tab 按下时轻微压暗(激活态由 .on 负责,两者不冲突) */
