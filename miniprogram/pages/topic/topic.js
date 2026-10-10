@@ -45,7 +45,7 @@ Page({
     }
 
     // 主题落地页必须「条目直出」。
-    // 旧版点「钱」看到的是章节的书名(不要早死 / 不要慢慢死)—— 那是书的语言,
+    // 旧版点标签看到的是章节书名 —— 那是书的语言,
     // 用户点进来是想直接看内容,不是再解一次码。
     const ids = topics.sectionsOfTag(id)
     const secs = guide.sectionTitles().filter(function (s) {

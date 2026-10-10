@@ -25,8 +25,9 @@ const HAYSTACK = FLAT.map(function (e) {
 })
 const HAS_LATIN = /[a-z]/
 
-// 搜索排序用:A 级证据排最前,未知等级沉底(全站唯一一份等级权重)
-const LEVEL_WEIGHT = { A: 0, B: 1, C: 2 }
+// 搜索排序用:A 级证据排最前,未知等级沉底(全站唯一一份等级权重)。
+// 数据目前只有 A/B 两档;上游若新增 C 级,这里加一行 C: 2 即可(未知等级自动沉底)。
+const LEVEL_WEIGHT = { A: 0, B: 1 }
 
 // 除标题和说人话之外的正文部分,参与搜索与「朴素匹配」对照
 function restText(it) {
