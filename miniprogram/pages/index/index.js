@@ -27,7 +27,7 @@ function toRow(h, q, readMap) {
     level: h.entry.item.level,
     tier: h.entry.item.tier,
     plain: h.entry.item.plain,
-    // 护城河是 1713 条来源,却只藏在详情页第 4 屏 —— 列表层就要看得见
+    // 护城河是 99 条来源,却只藏在详情页第 4 屏 —— 列表层就要看得见
     sourceCount: (h.entry.item.source || []).length,
     read: !!(readMap && readMap[h.entry.item.id])
   }
@@ -309,8 +309,8 @@ Page({
     }
     const hits = guide.search(q, this.data.filter)
     this._hits = hits.slice(0, LIMIT)
-    // 命中超过 400 条基本等于「没筛」——搜「的」会命中全书 675 条,提醒用户换词
-    const tooBroad = hits.length > 400
+    // 命中超过全库六成基本等于「没筛」——搜「的」几乎命中全书,提醒用户换词
+    const tooBroad = hits.length > Math.round(guide.itemCount() * 0.6)
     this._q = q
     // 已读集合在循环外只算一次。
     // 原来写在 .map() 回调里 = 每渲染一行就同步读一次 storage:20 行纯 JS 1.23ms,

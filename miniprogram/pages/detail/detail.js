@@ -37,7 +37,7 @@ Page({
     plain: '',     // 说人话
     benefit: '',   // 能得什么
     note: '',      // 要注意什么
-    costChips: [], // 成本标签拆成的胶囊:钱=0 / 时间=少 / …
+    costChips: [], // 成本标签胶囊:上游若提供 costTag 则拆开显示;摸鱼指南暂无,恒为空
     source: [],    // [{t: 出处, u: 链接, host: 域名}]
     faved: false,
     notFound: false,
@@ -66,7 +66,7 @@ Page({
       return
     }
     recent.markRead(id)
-    // 已读集合不在这里写 —— 它最多 675 个 id(约 3.4KB),同步写 storage 会挡在首屏渲染前面,
+    // 已读集合不在这里写 —— 它最多 200 个 id(约 1KB),同步写 storage 会挡在首屏渲染前面,
     // 表现就是"点了一条要等一下才跳过来"。挪到 onReady(首屏渲染之后)再写。
     const item = entry.item
     wx.setNavigationBarTitle({ title: item.title })
@@ -102,7 +102,7 @@ Page({
 
   onReady() {
     // 已读集合挪到这里写:首屏已经渲染完了,写 storage 不再挡渲染。
-    // 只在遇到新 id 时才真正落盘(recent.markReadId 内部判断),所以一辈子最多写 675 次。
+    // 只在遇到新 id 时才真正落盘(recent.markReadId 内部判断),所以最多写 200 次。
     if (this.data.id) recent.markReadId(this.data.id)
 
     // 底部那排操作按钮要滚过整个正文才看得到(正文中位 418 字、最长 1809 字)。
@@ -169,7 +169,7 @@ Page({
   //    「承载网页的容器……个人类型的小程序暂不支持使用」。
   //    个人主体小程序无法在小程序内打开任何第三方网页;即使换成企业主体,
   //    web-view 也要求域名在自有「业务域名」白名单里(最多 200 个,且要上传校验文件),
-  //    而全书的 1713 条来源横跨几百个政府/学术站点,一个都不归我们所有。
+  //    而全书的 99 条来源横跨多个政府/学术站点,一个都不归我们所有。
   //    → 复制链接到浏览器打开,是唯一可行且合规的方式。
   onCopyLink(e) {
     const u = e.currentTarget.dataset.u

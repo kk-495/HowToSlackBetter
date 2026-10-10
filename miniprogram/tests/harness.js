@@ -28,6 +28,9 @@ let dup = 0
 data.sections.forEach(s => s.items.forEach(i => { if (ids.has(i.id)) dup++; ids.add(i.id) }))
 t('条目 id 无重复', dup === 0, 'dup=' + dup)
 t('id 数量 = count', ids.size === data.meta.count)
+// id 稳定化:章号 + 标题哈希(36 进制 6 位)。上游插入新条目时老条目 id 不漂移,收藏/已读不丢
+t('id 格式 = 章号-标题哈希', data.sections.every(s => s.items.every(i =>
+  new RegExp('^' + s.id + '-[a-z0-9]{6}$').test(i.id))))
 
 // 上游的六个字段(成本/说人话/收益/证据等级/来源/备注)必须完整保留,不再压成一段
 const FIELDS = ['id', 'title', 'cost', 'plain', 'benefit', 'level', 'levelNote', 'source', 'note', 'costTag', 'tier']
@@ -183,11 +186,12 @@ t('只剩一条时也能返回', !!only)
 
 // ---- 6. 收藏 ----
 const fav = require(path.join(APP, 'utils', 'favorite.js'))
+const realIds = guide.allItems().map(function (e) { return e.item.id })
 t('初始无收藏', fav.listFavorites().length === 0)
-t('toggle 加入', fav.toggleFavorite('1-1') === true && fav.isFavorite('1-1'))
-t('toggle 取消', fav.toggleFavorite('1-1') === false && !fav.isFavorite('1-1'))
-t('收藏可保存与读取', (fav.saveFavorites(['2-1']), fav.isFavorite('2-1') && fav.listFavorites().length === 1))
-fav.saveFavorites(['3-1', '3-2'])
+t('toggle 加入', fav.toggleFavorite(realIds[0]) === true && fav.isFavorite(realIds[0]))
+t('toggle 取消', fav.toggleFavorite(realIds[0]) === false && !fav.isFavorite(realIds[0]))
+t('收藏可保存与读取', (fav.saveFavorites([realIds[1]]), fav.isFavorite(realIds[1]) && fav.listFavorites().length === 1))
+fav.saveFavorites([realIds[0], realIds[1]])
 t('收藏条目能取到正文', fav.favoriteEntries(guide.allItems()).length === 2)
 fav.saveFavorites([])
 t('收藏可清空', fav.listFavorites().length === 0)
@@ -248,17 +252,19 @@ t('源码无登录/getUserProfile', noNet.indexOf('getUserProfile') === -1)
 
 // ---- 6b. 阅读历史 ----
 const recent = require(path.join(APP, 'utils', 'recent.js'))
+const idA = realIds[0]
+const idB = realIds[1]
 t('初始无历史', recent.list().length === 0)
-recent.markRead('1-1', 100)
-t('记一条', recent.list().length === 1 && recent.list()[0].id === '1-1')
-recent.markRead('2-1', 200)
-t('新的排最前', recent.list()[0].id === '2-1' && recent.list()[1].id === '1-1')
-recent.markRead('1-1', 300)
-t('重复读不叠加且提前', recent.list().length === 2 && recent.list()[0].id === '1-1')
+recent.markRead(idA, 100)
+t('记一条', recent.list().length === 1 && recent.list()[0].id === idA)
+recent.markRead(idB, 200)
+t('新的排最前', recent.list()[0].id === idB && recent.list()[1].id === idA)
+recent.markRead(idA, 300)
+t('重复读不叠加且提前', recent.list().length === 2 && recent.list()[0].id === idA)
 t('空 id 不记', (recent.markRead('', 400), recent.list().length === 2))
 t('历史可映射为条目', recent.entries(guide.allItems()).length === 2)
 const many = []
-for (let i = 1; i <= 40; i++) many.push(i + '-1')
+for (let i = 0; i < 40; i++) many.push(realIds[i % realIds.length] + '-' + i)
 many.forEach(function (id, k) { recent.markRead(id, k) })
 t('历史上限 30 条', recent.list().length === 30, recent.list().length)
 recent.clear()
@@ -439,17 +445,16 @@ t('历史可清空', recent.list().length === 0)
     const s = fs.readFileSync(path.join(APP, 'pages', 'index', 'index.js'), 'utf8')
     return /let noticeShown = false/.test(s) && s.indexOf('if (noticeShown) return') !== -1
   })())
-  // 开篇卡文案:v3 合订本(slogan 取自摸鱼指南封面,数字与 manifest 实测一致) —— 有回归测试守着
+  // 开篇卡文案:v3(slogan 取自摸鱼指南封面,数字从 manifest 实时取,不再硬编码)
   const popupJs = fs.readFileSync(path.join(APP, 'components', 'launch-popup', 'index.js'), 'utf8')
   const COPY = [
     '高性价比摸鱼指南',
     '少一点无效忙碌，多留',
     '时间、精力与边界',
     '会议与异步 · 注意力 · 休假边界 · 情绪劳动 · 远程协作 · 工时排班 · 场景话术',
-    '90 条建议',
-    'A 级证据 25 条',
-    '99 条原始文献链接',
-    '可按证据等级筛选'
+    'guide.meta.count',          // 总条数从 manifest 取
+    "e.item.level === 'A'",      // A 级条数实时统计
+    'guide.meta.linkCount'       // 来源链接数从 manifest 取
   ]
   t('弹窗卡片文案与原图逐字一致', COPY.every(function (s) { return popupJs.indexOf(s) !== -1 }),
     COPY.filter(function (s) { return popupJs.indexOf(s) === -1 }).join(' / '))
@@ -650,7 +655,7 @@ t('历史可清空', recent.list().length === 0)
   t('已读集合只在遇到新 id 时才写 storage(不拖慢详情页)',
     /if \(m\[id\]\) return/.test(read('utils/recent.js')))
   t('打开详情会记入已读集合', /markReadId\(/.test(read('pages/detail/detail.js')))
-  // 已读集合最多 675 个 id(约 3.4KB),同步写 storage 不能挡在首屏渲染前面
+  // 已读集合最多 200 个 id(约 1KB),同步写 storage 不能挡在首屏渲染前面
   t('已读写盘挪到 onReady(不挡首屏渲染)', (function () {
     const src = read('pages/detail/detail.js')
     const onLoad = src.slice(src.indexOf('onLoad('), src.indexOf('onReady('))

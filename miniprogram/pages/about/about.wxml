@@ -70,14 +70,6 @@
     </view>
 
     <view class="how-block">
-      <view class="how-label">性价比怎么算</view>
-      <view class="how-body">
-        按「要花多少钱 / 多少时间 / 多少毅力」对「能得多少收益」算出来的，分极高、高、一般三档。
-        每条建议顶部都列出了这几个维度的标签。
-      </view>
-    </view>
-
-    <view class="how-block">
       <view class="how-label">来源怎么查</view>
       <view class="how-body">
         每条建议都附了原始出处（机构 + 链接）。详情页点一下即可复制链接，在浏览器里打开自己核对。

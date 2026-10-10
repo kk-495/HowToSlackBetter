@@ -15,7 +15,7 @@ SECTIONS.forEach(function (s) {
 })
 
 // 预计算小写检索字段(标题 / 说人话)。这两个字段小,常驻内存无压力。
-// 其余正文(收益 / 备注 / 成本)约 45 万字,不预存小写副本,只在查询含拉丁字母时按需转小写;
+// 其余正文(收益 / 备注 / 成本)不预存小写副本,首次拉丁查询时构建一次(见 lowerBodies);
 // 纯中文查询直接原文匹配 —— 覆盖绝大多数真实输入,热路径零额外开销。
 const HAYSTACK = FLAT.map(function (e) {
   return {
@@ -303,5 +303,6 @@ module.exports = {
   dailyTriple: dailyTriple,
   randomEntry: randomEntry,
   dateKey: dateKey,
-  dateLabel: dateLabel
+  dateLabel: dateLabel,
+  LEVEL_WEIGHT: LEVEL_WEIGHT
 }

@@ -44,9 +44,9 @@ function entries(flatten) {
 
 // ---- 已读标记 ----
 // 「最近在看」只留 30 条,不够给列表做已读标记,所以单独存一个 id 集合。
-// 只在遇到**新** id 时才写 storage,所以一辈子最多写 675 次,不会拖慢详情页。
+// 只在遇到**新** id 时才写 storage(上限 200 个),不会拖慢详情页。
 const KEY_READ = 'read_ids_v1'
-const READ_MAX = 675
+const READ_MAX = 200  // 上限 ≥ 全库条目数(90 条)即不会真的触发;留余量防未来数据增长
 
 function readIdMap() {
   const raw = store.read(KEY_READ, '')

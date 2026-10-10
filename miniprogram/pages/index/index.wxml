@@ -124,7 +124,7 @@
 
 <!-- 首页:三幕式(今日 / 先看这几条 / 怎么找)+ 搜索面板 -->
 <view class="wrap with-tabbar" wx:else>
-  <!-- 信任条:把「675 条建议 · 1713 条原始文献」从页脚提到首屏可见处 -->
+  <!-- 信任条:把「90 条建议 · 99 条原始文献」从页脚提到首屏可见处 -->
   <view class="trust-line">
     <text class="tl-strong">{{total}} 条建议</text><text class="tl-dot">·</text>{{sourceCount}} 条原始文献<text class="tl-dot">·</text>每条都能查到出处
   </view>

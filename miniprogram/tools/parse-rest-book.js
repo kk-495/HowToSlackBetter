@@ -45,6 +45,20 @@ function parseSources(raw) {
     .filter(Boolean)
 }
 
+// 条目 id 稳定化:章号 + 标题哈希(36 进制 6 位),不按章内序号编。
+// 原因:收藏/已读存的是 id,按序号编时上游在章中间插一条,后续所有 id 集体漂移,
+// 用户收藏会静默失效。哈希 id 只取决于条目自己的标题 —— 插入新条目不影响老条目。
+// 代价:上游改写某条标题时,那一条的 id 会变(收藏失效一条,可接受)。
+function slug(title) {
+  let h = 2166136261
+  const s = String(title)
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i)
+    h = (h * 16777619) >>> 0
+  }
+  return h.toString(36).padStart(6, '0').slice(-6)
+}
+
 // 解析单个 md 文件 → {no, title, items[]}
 function parseChapter(file) {
   const src = fs.readFileSync(path.join(BOOK_DIR, file), 'utf8')
@@ -112,7 +126,7 @@ chapters.forEach((c, i) => {
     else levelStat.other++
     sourceCount += it.source.length
     linkCount += it.source.filter(s => s.u).length
-    return Object.assign({ id: sid + '-' + (j + 1) }, it)
+    return Object.assign({ id: sid + '-' + slug(it.title) }, it)
   })
   itemCount += items.length
   const body = JSON.stringify({ id: sid, title: c.title, items: items })

@@ -1,3 +1,6 @@
+// 数字标签从 manifest 实时取 —— 数据更新后这里自动跟上,不会再出现「675/1713」式的陈旧硬编码。
+const guide = require('../../utils/guide.js')
+
 Component({
   properties: {
     show: { type: Boolean, value: false },
@@ -16,8 +19,7 @@ Component({
     //
     // ⚠️ 已知的审核风险(若被拒审优先检查):
     //   · 「时间、精力与边界」属收益描述,已避免效果承诺与绝对化用语(旧版「用最少的钱」已移除)
-    //   · 数字与 manifest 一致:90 条 / A 级 25 条 / 99 个链接,
-    //     均由 tools/parse-rest-book.js 从上游数据实测统计,不是拍出来的。
+    //   · 卡片上的数字(总条数 / A 级数 / 链接数)attached 时从 guide.meta 实时取,不会陈旧
     title: { type: String, value: '高性价比摸鱼指南' },
     headline: { type: String, value: '少一点无效忙碌，多留' },
     headlineEm: { type: String, value: '时间、精力与边界' },
@@ -27,13 +29,22 @@ Component({
 
   data: {
     picWidth: 690, // 750 * 0.92
-    // 数字标签:与 data/sections/index.js 的 manifest 统计保持一致(测试守着)
-    defaultTags: [
-      { text: '90 条建议', bg: '#DEEAF3', fg: '#1E5A8A' },
-      { text: 'A 级证据 25 条', bg: '#DFEBF4', fg: '#1E5A8A' },
-      { text: '99 条原始文献链接', bg: '#F6F6F7', fg: '#64646A' },
-      { text: '可按证据等级筛选', bg: '#F6F6F7', fg: '#64646A' }
-    ]
+    defaultTags: []
+  },
+
+  lifetimes: {
+    attached() {
+      // 数字全部来自实测 manifest:总条数 / A 级条数 / 带链接的来源数
+      const aCount = guide.allItems().filter(function (e) { return e.item.level === 'A' }).length
+      this.setData({
+        defaultTags: [
+          { text: guide.meta.count + ' 条建议', bg: '#DEEAF3', fg: '#1E5A8A' },
+          { text: 'A 级证据 ' + aCount + ' 条', bg: '#DFEBF4', fg: '#1E5A8A' },
+          { text: guide.meta.linkCount + ' 条原始文献链接', bg: '#F6F6F7', fg: '#64646A' },
+          { text: '可按证据等级筛选', bg: '#F6F6F7', fg: '#64646A' }
+        ]
+      })
+    }
   },
 
   observers: {

@@ -12,7 +12,7 @@ function toRow(e, readMap) {
     level: e.item.level,
     tier: e.item.tier,
     plain: e.item.plain,
-    // 护城河是 1713 条来源,却只藏在详情页第 4 屏 —— 列表层就要看得见
+    // 护城河是 99 条来源,却只藏在详情页第 4 屏 —— 列表层就要看得见
     sourceCount: (e.item.source || []).length,
     read: !!(readMap && readMap[e.item.id])
   }

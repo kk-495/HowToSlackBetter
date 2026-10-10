@@ -6,7 +6,7 @@ const PAGE = 20            // 每次渲染 20 条,触底再追加
 const TOP_THRESHOLD = 600  // 滚过这个距离才显示"回到顶部"
 const PICKS = 5            // 「本主题先看这几条」取前 5 条
 
-const LEVEL_RANK = { A: 0, B: 1, C: 2 }
+// 等级权重用 guide 的唯一一份(摸鱼数据只有 A/B,不给 C 留错觉)
 
 function rowOf(e, no) {
   return {
@@ -45,7 +45,7 @@ Page({
     }
 
     // 主题落地页必须「条目直出」。
-    // 旧版点「钱」看到的是 34 章的书名(不要早死 / 不要慢慢死)—— 那是书的语言,
+    // 旧版点「钱」看到的是章节的书名(不要早死 / 不要慢慢死)—— 那是书的语言,
     // 用户点进来是想直接看内容,不是再解一次码。
     const ids = topics.sectionsOfTag(id)
     const secs = guide.sectionTitles().filter(function (s) {
@@ -58,8 +58,8 @@ Page({
 
     // 顶部「本主题先看这几条」:同主题里证据等级最高的条目(A>B,再按 id 稳定)
     const easy = entries.slice().sort(function (a, b) {
-      const la = LEVEL_RANK[a.item.level]
-      const lb = LEVEL_RANK[b.item.level]
+      const la = guide.LEVEL_WEIGHT[a.item.level]
+      const lb = guide.LEVEL_WEIGHT[b.item.level]
       if (la !== lb) return (la === undefined ? 9 : la) - (lb === undefined ? 9 : lb)
       return a.item.id < b.item.id ? -1 : 1
     })

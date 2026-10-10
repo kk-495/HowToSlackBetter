@@ -237,7 +237,7 @@
   color: var(--color-secondary-ink);
 }
 
-/* ---- 信任条:护城河(1713 条来源)从页脚提到首屏 ---- */
+/* ---- 信任条:护城河(99 条来源)从页脚提到首屏 ---- */
 
 .trust-line {
   padding: var(--space-3) var(--page-gutter) var(--space-2);
