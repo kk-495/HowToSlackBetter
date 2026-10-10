@@ -155,6 +155,44 @@
   background: var(--color-surface-2);
 }
 
+/* 反馈块:公众号二维码。手机上不能扫自己的屏幕,交互是
+   点图放大(wx.previewImage),再长按识别(show-menu-by-longtap),关注后发私信 */
+.fb-block {
+  margin: var(--space-section) var(--page-gutter) 0;
+  padding: var(--space-4) 0;
+  border-top: 1rpx solid var(--color-rule);
+  border-bottom: 1rpx solid var(--color-rule);
+}
+
+.fb-head {
+  margin-top: var(--space-2);
+}
+
+.fb-t {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.fb-m {
+  margin-top: var(--space-1);
+  font-size: var(--fs-micro);
+  color: var(--color-text-secondary);
+}
+
+.fb-qr {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-3);
+  border: 1rpx solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #FFFFFF;
+}
+
+.fb-qr:active {
+  opacity: 0.85;
+}
+
 .about-entry-left {
   flex: 1;
   min-width: 0;

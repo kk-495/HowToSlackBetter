@@ -71,6 +71,22 @@
     </button>
   </view>
 
+  <!-- 反馈:展示公众号二维码,长按识别关注后发私信(点图放大更好识别) -->
+  <view class="fb-block">
+    <view class="kicker"><view class="tick"></view>反馈</view>
+    <view class="fb-head">
+      <view class="fb-t">反馈问题</view>
+      <view class="fb-m">长按识别二维码关注公众号,发私信最快</view>
+    </view>
+    <image
+      class="fb-qr"
+      src="/assets/official-mp.png"
+      mode="widthFix"
+      show-menu-by-longtap="{{true}}"
+      bindtap="previewMp"
+    />
+  </view>
+
   <!-- 关于:低频页,用编辑体风格的一行入口 -->
   <view class="about-entry" bindtap="goAbout">
     <view class="about-entry-left">

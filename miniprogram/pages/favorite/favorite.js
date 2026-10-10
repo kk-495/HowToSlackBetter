@@ -111,6 +111,11 @@ Page({
     wx.navigateTo({ url: '/pages/about/about' })
   },
 
+  // 放大公众号二维码:全屏后长按识别(show-menu-by-longtap),关注公众号发私信
+  previewMp() {
+    wx.previewImage({ urls: ['/assets/official-mp.png'] })
+  },
+
   // ---- 分享 ----
 
   onShareAppMessage() {
