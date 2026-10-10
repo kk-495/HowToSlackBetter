@@ -1,0 +1,391 @@
+/* 详情页:非 tabBar 页。像一篇编辑过的文章,而不是一堆卡片堆叠 */
+
+.wrap {
+  padding-top: var(--space-6);
+}
+
+/* ---- 标题区:直接落在纸面上 ---- */
+
+.d-head {
+  padding: 0 var(--page-gutter);
+}
+
+.d-title {
+  margin-top: var(--space-3);
+  font-size: var(--fs-h1);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.d-meta {
+  margin-top: var(--space-3);
+  font-size: var(--fs-meta);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+.d-meta .dot {
+  margin: 0 var(--space-2);
+  color: var(--color-border-strong);
+}
+
+/* ---- 证据等级批注(全书只有 5 条带批注,如「A（争议）」) ---- */
+
+.lvl-note {
+  color: var(--color-secondary-ink);
+}
+
+/* ---- 成本标签胶囊:钱 0 / 时间 少 / … ---- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+}
+
+.chip-mini {
+  height: 44rpx;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 var(--space-2) var(--space-2) 0;
+  padding: 0 var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-micro);
+  color: var(--color-text-secondary);
+}
+
+/* ---- 正文三节:不等权 ---- */
+
+.sec-blk {
+  padding: var(--space-section) var(--page-gutter) 0;
+}
+
+/* 「要注意什么」单独给警示色 —— 三节等权就是模板感 */
+.sec-blk.warn {
+  display: flex;
+}
+
+.warn .bar {
+  flex: none;
+  width: 6rpx;
+  background: var(--color-warning);
+  border-radius: 3rpx;
+}
+
+.warn-body {
+  flex: 1;
+  min-width: 0;
+  padding-left: var(--space-4);
+}
+
+.warn .lead-label {
+  color: var(--color-warning);
+}
+
+.warn .lead-label .tick {
+  background: var(--color-warning);
+}
+
+.lead-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-mark-ink);
+}
+
+.lead-label .tick {
+  flex: none;
+  width: 24rpx;
+  height: 4rpx;
+  margin-right: var(--space-2);
+  background: var(--color-mark);
+  border-radius: 2rpx;
+}
+
+/* 长正文阅读块 —— 内容型产品的命门。
+   word-break 必须是 normal,用 overflow-wrap 兜底,绝不拦腰截断中文 */
+.read-body {
+  font-size: var(--fs-h2);
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+  color: var(--color-text-primary);
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* 三档字号。下限 30rpx —— 设计系统禁止正文小于 30rpx,选"小"也不破线 */
+.read-body.f0 { font-size: 30rpx; }
+.read-body.f1 { font-size: 32rpx; }
+.read-body.f2 { font-size: 38rpx; }
+
+/* 「说人话」也跟着字号档位走 —— 需要大字的人,第一眼看的就是这一块 */
+.plain.big.f0 { font-size: 30rpx; }
+.plain.big.f1 { font-size: 32rpx; }
+.plain.big.f2 { font-size: 35rpx; }
+
+/* ---- 字号控件 ---- */
+
+.font-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-5) var(--page-gutter) 0;
+}
+
+.font-ctl {
+  display: flex;
+  align-items: center;
+  border: 1rpx solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.font-ctl .fc {
+  position: relative;
+  min-width: 84rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-meta);
+  color: var(--color-text-secondary);
+}
+
+/* 视觉高 64rpx,热区撑到 88rpx */
+.font-ctl .fc::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 88rpx;
+  transform: translateY(-50%);
+}
+
+.font-ctl .fc:first-child {
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+}
+
+.font-ctl .fc:last-child {
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+}
+
+.font-ctl .fc.on {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* ---- 来源列表 ---- */
+
+.src-blk {
+  padding: var(--space-section) var(--page-gutter) 0;
+}
+
+.lead-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lead-head .p-head {
+  margin-bottom: 0;
+}
+
+.src-tip {
+  margin: var(--space-2) 0 var(--space-3);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.src-copy-all {
+  flex: none;
+  min-height: 52rpx;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  border: 1rpx solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-micro);
+  color: var(--color-primary);
+}
+
+.src-copy-all:active {
+  background: var(--color-primary-soft);
+}
+
+.src-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+  border-top: 1rpx solid var(--color-rule);
+}
+
+.src-t {
+  flex: 1;
+  min-width: 0;
+  padding-right: var(--space-3);
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.src-host {
+  flex: none;
+  max-width: 46%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-micro);
+  color: var(--color-primary);
+}
+
+.src-item:active {
+  background: var(--color-surface-2);
+}
+
+/* 相关推荐容器(结构样式在 app.wxss) */
+.ed-pick {
+  margin: var(--space-2) var(--page-gutter) 0;
+}
+
+.actions {
+  display: flex;
+  padding: var(--space-section) var(--space-4) 0;
+}
+
+.actions .btn {
+  flex: 1;
+  min-width: 0;
+  margin: 0 var(--space-1);
+  padding: 0 var(--space-1);
+  font-size: var(--fs-meta);
+}
+
+/* ---- 分页:一行居中,不再是三个等宽盒子 ---- */
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--page-gutter) 0;
+}
+
+.pager .pg {
+  min-height: 88rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  font-size: var(--fs-meta);
+  color: var(--color-primary);
+}
+
+.pager .pg.off {
+  color: var(--color-text-placeholder);
+}
+
+.pager .pg-d {
+  color: var(--color-border-strong);
+}
+
+/* ---- 浮动操作条 ---- */
+/* 正文最长 1809 字,滚到底部那排按钮太累。滚过一屏后浮出来,
+   底部操作条进入视口时自动收起(见 detail.js 的 IntersectionObserver)。 */
+
+.float-bar {
+  position: fixed;
+  left: var(--page-gutter);
+  right: var(--page-gutter);
+  bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+  z-index: 160;
+  display: flex;
+  align-items: center;
+  padding: var(--space-2);
+  background: var(--color-surface);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-hero);
+}
+
+.fb {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-meta);
+  color: var(--color-text-secondary);
+}
+
+.fb:active {
+  background: var(--color-surface-2);
+}
+
+.fb.on {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* 分享仍然是「view 管外观 + 透明 button 管点击」——
+   小程序 <button> 的宽度约束不住,这个拆分是唯一可靠的写法 */
+.fb-visual {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fb-hit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  border: none;
+  background: transparent;
+}
+
+.fb-hit::after {
+  border: none;
+}
+
+.ad-slot {
+  margin: var(--space-section) var(--page-gutter) 0;
+}
+
+/* ===================================================================
+   点击反馈
+   =================================================================== */
+
+/* 字号档位 */
+.fc:active {
+  background: var(--color-surface-2);
+}
+
+/* 翻页:翻不动的那一侧不要给反馈,否则是假承诺 */
+.pg:not(.off):active {
+  background: var(--color-surface-2);
+}
+
+/* 浮动条的分享同样是「view 管外观 + 透明 button 管点击」 */
+.fb-slot:active .fb-visual {
+  opacity: 0.7;
+}

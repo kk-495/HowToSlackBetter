@@ -1,0 +1,65 @@
+<view class="wrap" wx:if="{{!notFound}}">
+  <view class="head">
+    <view class="kicker"><view class="tick"></view>按处境找</view>
+    <view class="h-title">{{name}}</view>
+    <view class="h-sub">{{desc}} · 覆盖 {{sections.length}} 章 {{count}} 条</view>
+  </view>
+
+  <!-- 条目直出:顶部先给「本主题先看这几条」 -->
+  <block wx:if="{{picks.length}}">
+    <view class="act-head">
+      <text class="zh">本主题先看这几条</text>
+      <text class="en">Start here</text>
+    </view>
+    <view class="ed-pick">
+      <view
+        class="ed-row"
+        wx:for="{{picks}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+      >
+        <view class="ed-num">{{item.no}}</view>
+        <view class="ed-body">
+          <view class="ed-t">{{item.title}}</view>
+          <view class="ed-m">{{item.section}} · 证据 {{item.level}} · {{item.sourceCount}} 条来源</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="act-head">
+    <text class="zh">全部 {{count}} 条</text>
+    <text class="en">{{name}}</text>
+  </view>
+  <view class="ed-list">
+    <view
+      class="ed-item"
+      wx:for="{{items}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="ei-head">
+        <text class="badge {{item.level === 'A' ? 'a' : (item.level === 'B' ? 'b' : 'c')}}">{{item.level}}</text>
+        <view class="ei-title">{{item.title}}</view>
+      </view>
+      <view class="ei-sub">{{item.section}} · {{item.sourceCount}} 条来源</view>
+      <view class="plain" wx:if="{{item.plain}}">{{item.plain}}</view>
+    </view>
+  </view>
+
+  <view class="foot">
+    想看全部 34 章?回首页「按章节读」。这部分内容按你选的处境筛出来,可能横跨多个章节。
+  </view>
+</view>
+
+<view class="empty" wx:else>
+  <view class="empty-title">没有这个主题</view>
+  <view class="empty-sub">链接可能已失效</view>
+  <view class="empty-btn" bindtap="goHome">回首页</view>
+</view>
+
+<view class="to-top" wx:if="{{showTop}}" bindtap="backToTop">
+  <view class="ic ic-up"></view>
+</view>

@@ -1,0 +1,919 @@
+/* ===================================================================
+   暖读 / Warm Read — 全局设计令牌与公共样式（v2：去 AI 味）
+   令牌来源:.workbuddy-ai/design/phase2-design-system.md §10
+            + deliverables/gstack/redesign-ui-2026-10-09.md §3（v2 增量）
+
+   约定:全站颜色/间距/圆角/阴影/字号只从下面这组变量取值,不要在页面里硬编码 HEX。
+   
+   v2 三条硬规则(去「模板感」的根):
+     ① 三权分立 —— 绿只给可交互;陶土赭只做编辑标记;琥珀金几乎不用
+     ② 字号从 12 档收到 6 档,并拉开顶部对比
+     ③ 全站只留 1 档阴影;卡片默认不再浮起(浮起是稀缺资源)
+   =================================================================== */
+
+page {
+  /* ---- 品牌色 ---- */
+  --color-primary:        #2E6B4C;
+  --color-primary-strong: #245440;
+  --color-primary-soft:   #E8F1EB;
+  --color-on-primary:     #FFFFFF;   /* 主色上的字(暗色下必须翻深,否则白字只有 2.6:1) */
+  --color-secondary:      #A8623A;
+  --color-secondary-ink:  #8F5227;
+  --color-secondary-soft: #F6ECE3;
+  --color-accent:         #C08A2E;
+  --color-accent-ink:     #8A6117;
+  --color-accent-soft:    #FBF1DC;
+
+  /* ---- 编辑标记(陶土赭的语义别名):眉标、编辑线、章节序号 ---- */
+  --color-mark:           #A8623A;
+  --color-mark-ink:       #8F5227;
+
+  /* ---- 语义色(同时承载证据等级 A/B/C) ---- */
+  --color-success:      #2E7D4F;
+  --color-success-soft: #E7F2EA;
+  --color-warning:      #A86B00;
+  --color-warning-soft: #FBF0DA;
+  --color-danger:       #C43D2E;
+  --color-danger-soft:  #FBE9E6;
+  --color-info:         #2F6B8F;
+  --color-info-soft:    #E7F0F5;
+
+  /* ---- 中性 / 背景 / 描边 ---- */
+  --color-bg:            #FAF7F2;
+  --color-surface:       #FFFFFF;
+  --color-surface-2:     #F3EEE6;
+  --color-border:        #E9E2D6;
+  --color-border-strong: #D8CEBD;
+  /* 发丝线:列表/区块的分隔语义别名,永远 1rpx */
+  --color-rule:          #E9E2D6;
+
+  /* ---- 文字三级 + 占位 ---- */
+  --color-text-primary:     #2A2520;
+  --color-text-secondary:   #635B50;
+  --color-text-tertiary:    #857B6E;
+  --color-text-placeholder: #B0A79A;
+
+  /* ---- 间距(4rpx 基准) + 三级节奏 ---- */
+  --space-1: 4rpx;  --space-2: 8rpx;  --space-3: 12rpx;
+  --space-4: 16rpx; --space-5: 24rpx; --space-6: 32rpx;
+  --space-7: 40rpx; --space-8: 48rpx; --space-9: 64rpx;
+  --space-section: 56rpx;   /* 区块级分隔(以前整页没有一处用过) */
+  --space-act:     88rpx;   /* 幕与幕之间 */
+  --page-gutter: 24rpx;
+
+  /* ---- 字号阶梯:6 档(原来 12 档,相邻只差 2rpx 根本分不出) ---- */
+  --fs-display: 46rpx;   /* 今日一条 / 页大标题 */
+  --fs-h1:      38rpx;   /* 条目标题 */
+  --fs-h2:      32rpx;   /* 区块标题 / 长正文 */
+  --fs-body:    30rpx;   /* 正文 / 列表标题 */
+  --fs-meta:    26rpx;   /* 元信息(原 24/26/28 统一) */
+  --fs-micro:   22rpx;   /* 徽标 / 眉标 / tab */
+
+  /* ---- 圆角:收敛为 3 档 + 证据印章 ---- */
+  --radius-stamp: 2rpx;   /* 证据「印章」:方,像钢印 */
+  --radius-sm:    12rpx;  /* 输入 / 小控件 */
+  --radius-md:    16rpx;  /* 唯一浮起卡片 */
+  --radius-pill:  999rpx;
+
+  /* ---- 阴影:全站只留 1 档,只给「唯一浮起元素」(今日卡 / 浮层 / 回顶) ---- */
+  --shadow-hero: 0 8rpx 24rpx rgba(60,48,30,0.10);
+
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue',
+               'Source Han Sans SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+/* ===== 深色模式(纯 CSS,零成本)=====
+   注意:深色下主色需整体提亮才能对暗底达标,不要把浅色令牌直接搬过来;
+   反过来,主色提亮后「主色上的字」必须转深 —— 这就是 --color-on-primary 存在的原因 */
+@media (prefers-color-scheme: dark) {
+  page {
+    --color-bg:               #1C1917;
+    --color-surface:          #262220;
+    --color-surface-2:        #2F2A27;
+    --color-border:           #3A3430;
+    --color-border-strong:    #4A423C;
+    --color-rule:             #3A3430;
+    --color-text-primary:     #F0EBE4;
+    --color-text-secondary:   #B6AC9F;
+    --color-text-tertiary:    #8A8073;
+    --color-text-placeholder: #6E655B;
+    --color-primary:          #5FA47C;
+    --color-primary-strong:   #4E8C67;
+    --color-primary-soft:     #23372C;
+    --color-on-primary:       #1C1917;
+    --color-secondary:        #C98A5F;
+    --color-secondary-ink:    #D89A6E;
+    --color-secondary-soft:   #3A2C22;
+    --color-mark:             #C98A5F;
+    --color-mark-ink:         #D89A6E;
+    --color-accent:           #D9A84E;
+    --color-accent-ink:       #E4BC6C;
+    --color-accent-soft:      #3A3120;
+    --color-success:          #5FA47C;
+    --color-success-soft:     #23372C;
+    --color-warning:          #D2A048;
+    --color-warning-soft:     #3A3120;
+    --color-danger:           #E06B5C;
+    --color-danger-soft:      #3E2622;
+    --color-info:             #6FA6C8;
+    --color-info-soft:        #22333E;
+    --shadow-hero:            0 8rpx 24rpx rgba(0,0,0,0.45);
+  }
+}
+
+/* ===================================================================
+   布局容器
+   =================================================================== */
+
+.wrap {
+  padding-bottom: var(--space-7);
+}
+
+/* 有自定义 tabBar 的页面,底部留出 tabBar 高度 + 安全区 */
+.wrap.with-tabbar {
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+/* 发丝线:列表/区块的分隔一律用它,不要用卡片外壳 */
+.hair {
+  height: 1rpx;
+  margin: 0;
+  background: var(--color-rule);
+}
+
+/* ===================================================================
+   编辑体元素(去「模板感」的关键)
+   =================================================================== */
+
+/* 眉标 kicker:小、紧、带一根编辑线 —— 原来全站没有这种「编辑判断」的痕迹 */
+.kicker {
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-mark-ink);
+}
+
+.kicker .tick {
+  flex: none;
+  width: 28rpx;
+  height: 4rpx;
+  margin-right: var(--space-3);
+  background: var(--color-mark);
+  border-radius: 2rpx;
+}
+
+/* 幕标题:中日文主标题 + 英文副标,拉开权重 */
+.act-head {
+  display: flex;
+  align-items: baseline;
+  padding: var(--space-act) var(--page-gutter) var(--space-3);
+}
+
+.act-head .zh {
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.act-head .en {
+  margin-left: var(--space-3);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.14em;
+  color: var(--color-text-placeholder);
+  text-transform: uppercase;
+}
+
+/* 唯一浮起元素:今日卡。阴影 + 圆角都从令牌取 */
+.hero {
+  margin: var(--space-2) var(--page-gutter) 0;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hero);
+  animation: rise 180ms ease-out both;
+}
+
+/* 首屏少量元素 180ms 淡入上浮:只给浮起卡与幕标题,
+   100 条搜索结果**不做**逐行动画(逐行动画是廉价感的重灾区) */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8rpx); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ===================================================================
+   编辑条目 —— 列表统一「扁平行 + 发丝线」,不再一屏 100 张浮动卡
+   全站复用:首页搜索 / 章节 / 收藏 / 主题 / 精选
+   =================================================================== */
+
+.ed-list {
+  border-top: 1rpx solid var(--color-rule);
+}
+
+.ed-item {
+  padding: var(--space-4) 0;
+  border-bottom: 1rpx solid var(--color-rule);
+}
+
+.ed-item:active {
+  background: var(--color-surface-2);
+}
+
+.ei-head {
+  display: flex;
+  align-items: flex-start;
+}
+
+.ei-title {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.ei-sub {
+  margin-top: var(--space-2);
+  font-size: var(--fs-micro);
+  color: var(--color-text-secondary);
+}
+
+/* 编辑推荐:左侧一根陶土编辑线,序号用陶土色 —— 这是「有人挑过」的信号 */
+.ed-pick {
+  border-left: 6rpx solid var(--color-mark);
+  padding-left: var(--space-4);
+}
+
+.ed-row {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--space-3) 0;
+}
+
+.ed-row + .ed-row {
+  border-top: 1rpx solid var(--color-rule);
+}
+
+.ed-row:active {
+  background: var(--color-surface-2);
+}
+
+.ed-num {
+  flex: none;
+  width: 44rpx;
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-mark);
+  font-variant-numeric: tabular-nums;
+}
+
+.ed-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ed-t {
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.ed-m {
+  margin-top: var(--space-1);
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.ed-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  font-size: var(--fs-meta);
+  color: var(--color-primary);
+}
+
+.ed-more:active {
+  opacity: 0.7;
+}
+
+/* 今日的另外两条 / 一般条形链接 */
+.more-row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) 0;
+  border-bottom: 1rpx solid var(--color-rule);
+}
+
+.more-row:active {
+  background: var(--color-surface-2);
+}
+
+.mr-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.mr-title {
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  word-break: normal;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.mr-sub {
+  margin-top: var(--space-1);
+  font-size: var(--fs-micro);
+  color: var(--color-text-secondary);
+}
+
+/* ===================================================================
+   卡片 —— v2 起默认**不再浮起**(浮起是稀缺资源,只给 .hero)。
+   保留 .card 作为「有底色的一块」,需要分隔时用发丝线。
+   =================================================================== */
+
+.card {
+  margin: 0 var(--page-gutter) var(--space-5);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+}
+
+.card .c-title {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.card .c-sub {
+  margin-top: var(--space-2);
+  font-size: var(--fs-meta);
+  color: var(--color-text-secondary);
+}
+
+/* 长正文:内容型产品的命门,断行绝不能拦腰截断中文 */
+.card .c-body {
+  margin-top: var(--space-4);
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.cost {
+  margin-top: var(--space-2);
+  font-size: var(--fs-meta);
+  color: var(--color-mark-ink);
+}
+
+/* ===================================================================
+   证据等级 A / B / C —— v2 起用「方形印章」,不用胶囊(胶囊是 UI 味)
+   强弱递减:C 刻意不用彩色
+   =================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36rpx;
+  height: 36rpx;
+  padding: 0 var(--space-1);
+  margin-right: var(--space-2);
+  border-radius: var(--radius-stamp);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+}
+
+.badge.a {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.badge.b {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.badge.c {
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+}
+
+/* ===================================================================
+   胶囊 / 标签
+   视觉高度 56rpx,但点击热区靠透明 ::after 撑到 88rpx —— 中老年友好
+   =================================================================== */
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 var(--space-5);
+  margin: 0 var(--space-3) var(--space-2) 0;
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-meta);
+  color: var(--color-text-secondary);
+}
+
+.chip::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 88rpx;
+  transform: translateY(-50%);
+}
+
+.chip.on {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ===================================================================
+   「说人话」块 —— 产品签名。v2 起加陶土左编辑线,不再是无源的浅色块
+   =================================================================== */
+
+.plain {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-secondary-soft);
+  border-left: 6rpx solid var(--color-mark);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: var(--fs-meta);
+  line-height: 1.75;
+  color: #3A342C;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.plain.big {
+  margin: 0 var(--page-gutter) var(--space-5);
+  padding: var(--space-5);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: var(--fs-h2);
+  line-height: 1.75;
+}
+
+@media (prefers-color-scheme: dark) {
+  .plain {
+    color: var(--color-text-primary);
+  }
+}
+
+.p-head {
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-mark-ink);
+}
+
+/* ===================================================================
+   按钮
+   小程序 <button> 自带 ::after 边框,必须清掉
+   =================================================================== */
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  padding: 0 var(--space-5);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  line-height: 1.4;
+  border-radius: var(--radius-sm);
+  border: none;
+  letter-spacing: 0.01em;
+}
+
+.btn::after {
+  border: none;
+}
+
+.btn.ghost {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 1rpx solid var(--color-primary);
+}
+
+.btn.ghost::after {
+  border: none;
+}
+
+.btn:active {
+  background: var(--color-primary-strong);
+  color: var(--color-on-primary);
+}
+
+/* 次按钮按下时必须自己接管 color。
+   .btn.ghost(0-2-0)与 .btn:active(0-2-0)特异性相等,后写的赢且只改 background
+   → 按下时是「主色文字压在 primary-strong 上」,实测对比度只有 1.37:1(文字几乎消失)。
+   补一条特异性更高的 .btn.ghost:active(0-3-0),就不依赖书写顺序了。 */
+.btn.ghost:active {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* ===================================================================
+   区块标题 / 空态 / 页脚
+   =================================================================== */
+
+.row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: var(--space-5) var(--page-gutter) var(--space-2);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.row-head .link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 88rpx;
+  font-size: var(--fs-meta);
+  font-weight: 400;
+  color: var(--color-primary);
+}
+
+.empty {
+  padding: var(--space-9) var(--space-8);
+  text-align: center;
+  font-size: var(--fs-meta);
+  color: var(--color-text-secondary);
+}
+
+.empty-sub {
+  margin-top: var(--space-3);
+  font-size: var(--fs-meta);
+  color: var(--color-text-secondary);
+}
+
+/* 列表里的「已读」标记:用三级文字色,比正文弱但不至于看不见 */
+.read-tag {
+  color: var(--color-text-tertiary);
+}
+
+/* 空态的标题与动作按钮:收藏页、详情页失效态共用 */
+.empty-title {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.empty-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  margin-top: var(--space-6);
+  padding: 0 var(--space-7);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+
+.empty-btn:active {
+  background: var(--color-primary-strong);
+}
+
+/* ===================================================================
+   点击反馈
+   ===================================================================
+   按下即现、松开即还原,纯视图层(:active)实现 —— 不用 JS 延时伪造。
+   小程序里 :active 由渲染层处理、不跨逻辑层线程,所以不会产生"点了没反应"的延迟感。
+   强度三级:主按钮最强,次按钮与胶囊中等,列表行与卡片最弱。
+
+   注意:.card 的 :active 不写在这里。详情页的 .card 是静态容器,
+   统一写会让"点正文也变暗",形成假反馈。各页按自己是否可点单独加。
+   =================================================================== */
+
+/* 胶囊:筛选 / 热词 / 排序 —— 中等强度 */
+.chip:active {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* 图标按钮:关闭 / 回到顶部 / 删除单条 */
+.ic-close:active,
+.to-top:active {
+  background: var(--color-surface-2);
+}
+
+.footer {
+  padding: var(--space-8) var(--space-8) var(--space-7);
+  text-align: center;
+  font-size: var(--fs-micro);
+  line-height: 1.8;
+  color: var(--color-text-secondary);
+}
+
+/* 搜索命中高亮:用辅色 ink,不用刺眼红 */
+.hl {
+  color: var(--color-secondary-ink);
+  font-weight: 600;
+}
+
+/* ===================================================================
+   纯 CSS 图标(替换 emoji,统一 3rpx 线宽 / currentColor 着色)
+   =================================================================== */
+
+.ic {
+  position: relative;
+  display: inline-block;
+  width: 32rpx;
+  height: 32rpx;
+  flex: none;
+  color: currentColor;
+}
+
+/* 放大镜 */
+.ic-search::before {
+  content: '';
+  position: absolute;
+  left: 1rpx;
+  top: 1rpx;
+  width: 21rpx;
+  height: 21rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.ic-search::after {
+  content: '';
+  position: absolute;
+  right: 2rpx;
+  bottom: 3rpx;
+  width: 11rpx;
+  height: 3rpx;
+  background: currentColor;
+  border-radius: 2rpx;
+  transform: rotate(45deg);
+}
+
+/* 关闭叉 */
+.ic-close::before,
+.ic-close::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24rpx;
+  height: 3rpx;
+  background: currentColor;
+  border-radius: 2rpx;
+}
+
+.ic-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.ic-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* 右向箭头 › */
+.ic-arrow::before {
+  content: '';
+  position: absolute;
+  left: 9rpx;
+  top: 50%;
+  width: 13rpx;
+  height: 13rpx;
+  border-top: 3rpx solid currentColor;
+  border-right: 3rpx solid currentColor;
+  border-radius: 2rpx;
+  box-sizing: border-box;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* 左向箭头 ‹ */
+.ic-back::before {
+  content: '';
+  position: absolute;
+  left: 10rpx;
+  top: 50%;
+  width: 13rpx;
+  height: 13rpx;
+  border-left: 3rpx solid currentColor;
+  border-bottom: 3rpx solid currentColor;
+  border-radius: 2rpx;
+  box-sizing: border-box;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* 书 / 目录 */
+.ic-book::before {
+  content: '';
+  position: absolute;
+  left: 3rpx;
+  top: 4rpx;
+  width: 26rpx;
+  height: 24rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 3rpx;
+  box-sizing: border-box;
+}
+
+.ic-book::after {
+  content: '';
+  position: absolute;
+  left: 11rpx;
+  top: 4rpx;
+  width: 3rpx;
+  height: 24rpx;
+  background: currentColor;
+}
+
+/* 信息圈 */
+.ic-info::before {
+  content: '';
+  position: absolute;
+  left: 2rpx;
+  top: 2rpx;
+  width: 28rpx;
+  height: 28rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.ic-info::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6rpx;
+  height: 6rpx;
+  background: currentColor;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 收藏星:用系统自带字形,不用 clip-path(低版本基础库支持不稳) */
+.ic-star::before {
+  content: '☆';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32rpx;
+  height: 32rpx;
+  font-size: 32rpx;
+  line-height: 32rpx;
+  text-align: center;
+}
+
+.ic-star.on::before {
+  content: '★';
+}
+
+/* 人像(「我的」tab):一枚头 + 一段肩 */
+.ic-user::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 2rpx;
+  width: 13rpx;
+  height: 13rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+  box-sizing: border-box;
+  transform: translateX(-50%);
+}
+
+.ic-user::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 3rpx;
+  width: 24rpx;
+  height: 12rpx;
+  border: 3rpx solid currentColor;
+  border-bottom: none;
+  border-radius: 14rpx 14rpx 0 0;
+  box-sizing: border-box;
+  transform: translateX(-50%);
+}
+
+/* 向上箭头 ∧(回顶、展开) */
+.ic-up::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 13rpx;
+  height: 13rpx;
+  border-top: 3rpx solid currentColor;
+  border-right: 3rpx solid currentColor;
+  border-radius: 2rpx;
+  box-sizing: border-box;
+  transform: translate(-50%, -30%) rotate(-45deg);
+}
+
+/* 分享:一个开口向上的方框 + 一根带箭头的竖杆。
+   需要配合两个子元素 <view class="shaft"/> 与 <view class="head"/> 使用 */
+.ic-share::before {
+  content: '';
+  position: absolute;
+  left: 4rpx;
+  bottom: 2rpx;
+  width: 24rpx;
+  height: 18rpx;
+  border: 3rpx solid currentColor;
+  border-top: none;
+  border-radius: 0 0 5rpx 5rpx;
+  box-sizing: border-box;
+}
+
+.ic-share .shaft {
+  position: absolute;
+  left: 50%;
+  top: 5rpx;
+  width: 3rpx;
+  height: 16rpx;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.ic-share .head {
+  position: absolute;
+  left: 50%;
+  top: 2rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-top: 3rpx solid currentColor;
+  border-right: 3rpx solid currentColor;
+  border-radius: 2rpx;
+  box-sizing: border-box;
+  transform: translateX(-50%) rotate(-45deg);
+}
+
+/* ===================================================================
+   回到顶部(长列表用)
+   =================================================================== */
+
+.to-top {
+  position: fixed;
+  right: var(--space-5);
+  bottom: calc(180rpx + env(safe-area-inset-bottom));
+  z-index: 150;
+  width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1rpx solid var(--color-border);
+  border-radius: 50%;
+  box-shadow: var(--shadow-hero);
+  color: var(--color-primary);
+}
+
+/* 加载骨架/占位 */
+.skeleton {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+}

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "人生指南 · 675 条实用建议",
+  "usingComponents": {
+    "launch-popup": "/components/launch-popup/index"
+  }
+}

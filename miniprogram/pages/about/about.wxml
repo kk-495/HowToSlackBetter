@@ -1,0 +1,48 @@
+<view class="wrap">
+  <view class="card">
+    <view class="c-title">关于本小程序</view>
+    <view class="c-body">本工具把开源项目《{{meta.title}}》的全部 {{count}} 条建议、{{sectionCount}} 个章节整理成可搜索、可收藏的版本。内容为 {{meta.license}}(公有领域),原项目作者不保留任何权利。</view>
+  </view>
+
+  <view class="card">
+    <view class="p-head">特点</view>
+    <view class="feat">零后端、零网络:所有内容随包安装,断网可用</view>
+    <view class="feat">不收集任何个人信息,不需要登录</view>
+    <view class="feat">收藏与阅读记录只存在你自己的手机本地</view>
+  </view>
+
+  <!-- 用户看到「A级证据」但不知道是什么意思,解释清楚才建立得起信任 -->
+  <view class="card">
+    <view class="p-head">怎么看这些内容</view>
+
+    <view class="how-label">证据等级</view>
+    <view class="lv">
+      <text class="lv-b a">A</text>
+      <text class="lv-t">有研究或官方数据支撑,结论最硬</text>
+    </view>
+    <view class="lv">
+      <text class="lv-b b">B</text>
+      <text class="lv-t">有专家共识,但硬证据一般</text>
+    </view>
+    <view class="lv">
+      <text class="lv-b c">C</text>
+      <text class="lv-t">有道理,但缺少硬证据</text>
+    </view>
+
+    <view class="how-label">性价比</view>
+    <view class="how-body">按「要花多少钱 / 多少时间 / 多少毅力」对「能得多少收益」算出来的,分极高、高、一般三档。每条建议顶部都列出了这五个维度的标签。</view>
+
+    <view class="how-label">来源</view>
+    <view class="how-body">每条建议都附了原始出处(机构 + 年份 + 链接)。点一下可复制链接,自己核对。</view>
+  </view>
+
+  <view class="plain big">
+    <view class="p-head">免责声明</view>
+    本工具仅对公开开源内容做整理排版,不构成医疗、投资、法律或其他专业建议。涉及健康、金钱、法律的决策请以专业人士与权威部门信息为准。
+  </view>
+
+  <view class="card">
+    <view class="p-head">数据来源</view>
+    <text class="src" user-select>{{meta.sourceUrl}}</text>
+  </view>
+</view>

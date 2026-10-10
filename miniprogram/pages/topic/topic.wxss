@@ -1,0 +1,42 @@
+/* 主题 / 人生阶段落地页:非 tabBar 页,条目直出 */
+
+.wrap {
+  padding-top: var(--space-6);
+}
+
+.head {
+  padding: 0 var(--page-gutter);
+}
+
+.h-title {
+  margin-top: var(--space-3);
+  font-size: var(--fs-display);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.h-sub {
+  margin-top: var(--space-3);
+  font-size: var(--fs-meta);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.ed-pick {
+  margin: 0 var(--page-gutter);
+}
+
+.ed-list {
+  margin: 0 var(--page-gutter);
+}
+
+.foot {
+  margin-top: var(--space-section);
+  padding: 0 var(--page-gutter);
+  font-size: var(--fs-meta);
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}

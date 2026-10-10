@@ -1,0 +1,92 @@
+/* 关于页(非 tabBar 页:已从 tabBar 降级,入口在「我的」) */
+
+.wrap {
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-8);
+}
+
+.feat {
+  position: relative;
+  padding-left: var(--space-6);
+  margin-bottom: var(--space-3);
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  color: var(--color-text-primary);
+}
+
+.feat::before {
+  content: '';
+  position: absolute;
+  left: 6rpx;
+  top: 18rpx;
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+/* 长 URL 需要能断,但用 overflow-wrap 兜底即可,不用 break-all */
+.src {
+  display: block;
+  font-size: var(--fs-meta);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+/* ---- 怎么看这些内容 ---- */
+
+.how-label {
+  margin: var(--space-5) 0 var(--space-3);
+  font-size: var(--fs-meta);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.how-label:first-of-type {
+  margin-top: var(--space-3);
+}
+
+.how-body {
+  font-size: var(--fs-meta);
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.lv {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.lv-b {
+  flex: none;
+  width: 44rpx;
+  height: 44rpx;
+  margin-right: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 证据「印章」:方角,像钢印 */
+  border-radius: var(--radius-stamp);
+  font-size: var(--fs-micro);
+  font-weight: 600;
+  color: var(--color-on-primary);
+}
+
+.lv-b.a { background: var(--color-primary); }
+.lv-b.b { background: var(--color-accent); }
+.lv-b.c { background: var(--color-text-tertiary); }
+
+.lv-t {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-meta);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}

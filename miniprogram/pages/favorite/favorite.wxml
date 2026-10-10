@@ -1,0 +1,83 @@
+<view class="wrap with-tabbar">
+  <view class="mine-head">
+    <view class="kicker"><view class="tick"></view>我的</view>
+    <view class="m-title">我的收藏</view>
+    <view class="m-sub">收藏与阅读记录只存在你自己的手机本地,不上传、不需要登录</view>
+  </view>
+
+  <view class="fav-bar">
+    <view class="searchbox">
+      <view class="ic ic-search"></view>
+      <input
+        class="search-input"
+        placeholder="在收藏里搜"
+        placeholder-class="search-ph"
+        value="{{keyword}}"
+        confirm-type="search"
+        maxlength="30"
+        bindinput="onKeyword"
+      />
+      <view wx:if="{{keyword}}" class="ic ic-close" catchtap="onClearKeyword"></view>
+    </view>
+    <view class="chips">
+      <view class="chip {{sort === 'recent' ? 'on' : ''}}" data-s="recent" bindtap="onSort">最近收藏</view>
+      <view class="chip {{sort === 'section' ? 'on' : ''}}" data-s="section" bindtap="onSort">按章节</view>
+    </view>
+  </view>
+
+  <view class="c-count" wx:if="{{total}}">
+    共 {{total}} 条<text wx:if="{{searching}}"> · 匹配 {{matched}} 条</text>
+  </view>
+
+  <view class="ed-list">
+    <view
+      class="ed-item"
+      wx:for="{{list}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="ei-title">{{item.title}}</view>
+      <view class="ei-sub">{{item.section}} · {{item.sourceCount}} 条来源</view>
+    </view>
+  </view>
+
+  <!-- 一条都没收藏 -->
+  <view class="empty" wx:if="{{!total}}">
+    <view class="ic ic-star big-star"></view>
+    <view class="empty-title">还没有收藏</view>
+    <view class="empty-sub">在条目详情页点「☆ 收藏」,下次从这里快速找回</view>
+    <view class="empty-btn" bindtap="goHome">去翻指南</view>
+  </view>
+
+  <!-- 有收藏,但这个关键词在收藏里搜不到 -->
+  <view class="empty" wx:elif="{{searching && !matched}}">
+    <view class="ic ic-search big-search"></view>
+    <view class="empty-title">收藏里没有匹配「{{keyword}}」的内容</view>
+    <view class="empty-sub">换个词试试,或去指南页搜全文</view>
+    <view class="empty-btn" bindtap="goHome">去指南页</view>
+  </view>
+
+  <view class="share-row" wx:if="{{total}}">
+    <button class="btn ghost" open-type="share">
+      <view class="ic ic-share">
+        <view class="shaft"></view>
+        <view class="head"></view>
+      </view>
+      <text>分享我的收藏</text>
+    </button>
+  </view>
+
+  <!-- 关于:低频页,从 tabBar 降级成这里的一行 -->
+  <view class="link-row" bindtap="goAbout">
+    <view class="lk-body">
+      <view class="lk-t">关于本小程序</view>
+      <view class="lk-m">授权、证据等级怎么看、数据来源</view>
+    </view>
+    <view class="ic ic-arrow"></view>
+  </view>
+
+  <view class="footer">
+    内容源自开源项目《高性价比人生指南》(Unlicense 公有领域)<br/>仅作整理展示,不构成医疗、投资或法律建议
+  </view>
+</view>

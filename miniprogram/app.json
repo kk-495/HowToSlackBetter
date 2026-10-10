@@ -1,0 +1,45 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/section/section",
+    "pages/topic/topic",
+    "pages/detail/detail",
+    "pages/picks/picks",
+    "pages/favorite/favorite",
+    "pages/about/about"
+  ],
+  "window": {
+    "navigationBarTitleText": "人生指南",
+    "navigationBarBackgroundColor": "@navBgColor",
+    "navigationBarTextStyle": "@navTxtStyle",
+    "backgroundColor": "@bgColor",
+    "backgroundTextStyle": "@bgTxtStyle"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#635B50",
+    "selectedColor": "#2E6B4C",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "指南"
+      },
+      {
+        "pagePath": "pages/picks/picks",
+        "text": "发现"
+      },
+      {
+        "pagePath": "pages/favorite/favorite",
+        "text": "我的"
+      }
+    ]
+  },
+  "darkmode": true,
+  "themeLocation": "theme.json",
+  "permission": {},
+  "requiredPrivateInfos": [],
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

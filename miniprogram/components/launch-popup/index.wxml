@@ -1,0 +1,41 @@
+<view class="mask" wx:if="{{show}}" catchtouchmove="noop" bindtap="onClose">
+  <view class="stack">
+    <!-- 卡片模式:纯 WXML/WXSS,文字任意字号都清晰,配色取自暖读令牌 -->
+    <view class="card" wx:if="{{mode === 'card'}}">
+      <view class="kicker">
+        <view class="tick"></view>
+        <text>{{title}}</text>
+      </view>
+
+      <view class="headline">
+        {{headline}}<text class="em">{{headlineEm}}</text>
+      </view>
+
+      <view class="sub">{{sub}}</view>
+
+      <view class="tags">
+        <view
+          wx:for="{{tags.length ? tags : defaultTags}}"
+          wx:key="text"
+          class="tag"
+          style="background:{{item.bg}};color:{{item.fg}}"
+        >{{item.text}}</view>
+      </view>
+    </view>
+
+    <!-- 位图模式 -->
+    <image
+      wx:else
+      class="pic"
+      style="width:{{picWidth}}rpx"
+      src="{{image}}"
+      mode="widthFix"
+      binderror="onImgError"
+      bindtap="onTapImage"
+    />
+
+    <view class="close" catchtap="onClose">
+      <view class="ic-x"></view>
+    </view>
+  </view>
+</view>

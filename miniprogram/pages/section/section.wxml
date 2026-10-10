@@ -1,0 +1,32 @@
+<view class="wrap">
+  <view class="sec-head">
+    <view class="kicker"><view class="tick"></view>章节</view>
+    <view class="sec-title">{{title}}</view>
+    <view class="sec-sub">共 {{total}} 条<text wx:if="{{items.length < total}}"> · 已显示 {{items.length}} 条,继续下滑加载</text></view>
+  </view>
+
+  <view class="ed-list">
+    <view
+      class="ed-item"
+      wx:for="{{items}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="ei-head">
+        <text class="badge {{item.level === 'A' ? 'a' : (item.level === 'B' ? 'b' : 'c')}}">{{item.level}}</text>
+        <view class="ei-title">{{item.title}}</view>
+      </view>
+      <view class="ei-sub">性价比{{item.tier}} · {{item.sourceCount}} 条来源<text wx:if="{{item.read}}" class="read-tag"> · 已读</text></view>
+      <view class="plain" wx:if="{{item.plain}}">{{item.plain}}</view>
+    </view>
+  </view>
+
+  <view class="footer">
+    {{title}} · 共 {{total}} 条<br/>内容源自开源项目《高性价比人生指南》(Unlicense 公有领域)
+  </view>
+</view>
+
+<view class="to-top" wx:if="{{showTop}}" bindtap="backToTop">
+  <view class="ic ic-up"></view>
+</view>

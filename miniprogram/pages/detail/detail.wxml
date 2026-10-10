@@ -1,0 +1,139 @@
+<view class="wrap" wx:if="{{!notFound}}">
+  <!-- 标题直接落纸面,不做卡片外壳 -->
+  <view class="d-head">
+    <view class="kicker"><view class="tick"></view>{{section}} · 第 {{neighbor.index}} / {{neighbor.total}} 条</view>
+    <view class="d-title">{{title}}</view>
+    <view class="d-meta">
+      <text class="badge {{level === 'A' ? 'a' : (level === 'B' ? 'b' : 'c')}}">{{level}}</text>
+      <text>证据 {{level}}<text wx:if="{{levelNote}}" class="lvl-note">（{{levelNote}}）</text></text>
+      <text class="dot">·</text>
+      <text>性价比 {{tier}}</text>
+    </view>
+    <view class="chips" wx:if="{{costChips.length}}">
+      <view class="chip-mini" wx:for="{{costChips}}" wx:key="*this">{{item}}</view>
+    </view>
+    <view class="hair"></view>
+  </view>
+
+  <!-- 说人话:产品签名,加陶土编辑线 -->
+  <view class="plain big f{{fontScale}}" wx:if="{{plain}}">
+    <view class="p-head">说人话</view>
+    {{plain}}
+  </view>
+
+  <!-- 正文三节:不等权 ——「要注意什么」单独给警示色 -->
+  <view class="sec-blk" wx:if="{{cost}}">
+    <view class="lead-label"><view class="tick"></view>要花什么</view>
+    <view class="read-body f{{fontScale}}">{{cost}}</view>
+  </view>
+
+  <view class="sec-blk" wx:if="{{benefit}}">
+    <view class="lead-label"><view class="tick"></view>能得什么</view>
+    <view class="read-body f{{fontScale}}">{{benefit}}</view>
+  </view>
+
+  <view class="sec-blk warn" wx:if="{{note}}">
+    <view class="bar"></view>
+    <view class="warn-body">
+      <view class="lead-label"><view class="tick"></view>要注意什么</view>
+      <view class="read-body f{{fontScale}}">{{note}}</view>
+    </view>
+  </view>
+
+  <!-- 字号:三档 小 / 标准 / 大 -->
+  <view class="font-row">
+    <view class="font-ctl">
+      <view class="fc {{fontScale === 0 ? 'on' : ''}}" data-n="0" bindtap="onSetFont">小</view>
+      <view class="fc {{fontScale === 1 ? 'on' : ''}}" data-n="1" bindtap="onSetFont">标准</view>
+      <view class="fc {{fontScale === 2 ? 'on' : ''}}" data-n="2" bindtap="onSetFont">大</view>
+    </view>
+  </view>
+
+  <!-- 来源:每条建议都能查到出处。小程序不能打开外部网页,点一下复制链接 -->
+  <view class="src-blk" wx:if="{{source.length}}">
+    <view class="lead-head">
+      <view class="p-head">来源 · {{source.length}} 条</view>
+      <view class="src-copy-all" bindtap="onCopyAllSource">复制全部</view>
+    </view>
+    <view class="src-tip">小程序打不开外部网页,点击复制链接后在浏览器打开</view>
+    <view
+      class="src-item"
+      wx:for="{{source}}"
+      wx:key="u"
+      data-u="{{item.u}}"
+      bindtap="onCopyLink"
+    >
+      <view class="src-t">{{item.t}}</view>
+      <view class="src-host">{{item.host || '无链接'}}</view>
+    </view>
+  </view>
+
+  <!-- 跨章节「看更多同类」:被分享进来的人只有章节内导航,这是唯一出口 -->
+  <view class="act-head" wx:if="{{related.length}}">
+    <text class="zh">看更多同类</text>
+    <text class="en">Related</text>
+  </view>
+  <view class="ed-pick" wx:if="{{related.length}}">
+    <view
+      class="ed-row"
+      wx:for="{{related}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goRelated"
+    >
+      <view class="ed-body">
+        <view class="ed-t">{{item.title}}</view>
+        <view class="ed-m">{{item.section}} · 证据 {{item.level}} · {{item.sourceCount}} 条来源</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button class="btn" bindtap="onToggleFav">{{faved ? '★ 已收藏' : '☆ 收藏'}}</button>
+    <button class="btn ghost" bindtap="onCopy">复制</button>
+    <button class="btn ghost" open-type="share">分享</button>
+  </view>
+
+  <!-- 分页:从三个等宽盒子改成一行居中 -->
+  <view class="pager">
+    <view
+      class="pg {{neighbor.prev ? '' : 'off'}}"
+      data-id="{{neighbor.prev.id}}"
+      bindtap="goNeighbor"
+    >‹ 上一条</view>
+    <text class="pg-d">|</text>
+    <view class="pg" bindtap="goSection">本章目录</view>
+    <text class="pg-d">|</text>
+    <view
+      class="pg {{neighbor.next ? '' : 'off'}}"
+      data-id="{{neighbor.next.id}}"
+      bindtap="goNeighbor"
+    >下一条 ›</view>
+  </view>
+
+  <!-- 广告位:未开通流量主时不渲染任何 DOM(避免"未开通却展示广告位"被判违规)。
+       开通后把 adUnitId 填进 data 即可自动出现 -->
+  <view class="ad-slot" wx:if="{{adUnitId}}">
+    <ad unit-id="{{adUnitId}}"></ad>
+  </view>
+
+  <view class="footer">
+    内容源自开源项目《高性价比人生指南》(Unlicense 公有领域)<br/>仅作整理展示,不构成医疗、投资或法律建议
+  </view>
+</view>
+
+<view class="empty" wx:else>
+  <view class="empty-title">未找到这条内容</view>
+  <view class="empty-sub">链接可能已失效,或这条内容已经调整过</view>
+  <view class="empty-btn" bindtap="goHome">回首页</view>
+</view>
+
+<!-- 浮动操作条:正文长的时候不用滚到底就能收藏/分享。
+     滚过一屏出现,底部那排操作按钮进入视口后自动收起 -->
+<view class="float-bar" wx:if="{{showBar && !notFound}}">
+  <view class="fb {{faved ? 'on' : ''}}" bindtap="onToggleFav">{{faved ? '★ 已收藏' : '☆ 收藏'}}</view>
+  <view class="fb fb-slot">
+    <view class="fb-visual">分享</view>
+    <button class="fb-hit" open-type="share"></button>
+  </view>
+</view>

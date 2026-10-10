@@ -1,0 +1,46 @@
+/* 发现(tabBar 页):新手必看 Top 10 + 今天再看两条
+   扁平行 / 编辑线 / 序号等结构样式在 app.wxss,这里只管本页的边距与页头 */
+
+.wrap {
+  padding-top: var(--space-6);
+}
+
+.head {
+  padding: 0 var(--page-gutter) var(--space-section);
+}
+
+.h-title {
+  margin-top: var(--space-3);
+  font-size: var(--fs-display);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.h-sub {
+  margin-top: var(--space-4);
+  font-size: var(--fs-meta);
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.ed-pick {
+  margin: 0 var(--page-gutter);
+}
+
+.more-list {
+  margin: var(--space-2) var(--page-gutter) 0;
+  border-top: 1rpx solid var(--color-rule);
+}
+
+.foot {
+  margin-top: var(--space-section);
+  padding: 0 var(--page-gutter);
+  font-size: var(--fs-meta);
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  word-break: normal;
+  overflow-wrap: break-word;
+}

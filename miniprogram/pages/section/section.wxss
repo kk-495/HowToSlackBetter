@@ -1,0 +1,33 @@
+/* 章节页:非 tabBar 页,返回由原生导航栏提供,页面内不放 tabBar */
+
+.wrap {
+  padding-top: var(--space-5);
+}
+
+.sec-head {
+  padding: 0 var(--page-gutter) var(--space-5);
+}
+
+.sec-title {
+  margin-top: var(--space-3);
+  font-size: var(--fs-h1);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.sec-sub {
+  margin-top: var(--space-3);
+  font-size: var(--fs-meta);
+  color: var(--color-text-secondary);
+}
+
+/* 扁平行 + 发丝线(行结构在 app.wxss) */
+.ed-list {
+  margin: 0 var(--page-gutter);
+}
+
+/* 本页不是 tabBar 页,没有底部 tabBar 要避让,回顶按钮贴底就行 */
+.to-top {
+  bottom: calc(40rpx + env(safe-area-inset-bottom));
+}

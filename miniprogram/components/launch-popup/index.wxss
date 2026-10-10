@@ -1,0 +1,167 @@
+/* 启动弹窗。组件样式与 app.wxss 隔离,配色与图标在这里自带一份,
+   值取自设计令牌「暖读 / Warm Read」(见 app.wxss 顶部变量块)。 */
+
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 48rpx;
+  box-sizing: border-box;
+  background: rgba(42, 37, 32, 0.55);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 100%;
+}
+
+/* ---- 卡片模式 ---- */
+/* 配色逐像素取自原图 notice.png,不随深色模式改写 —— 用户要求配色也不改 */
+
+.card {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 44rpx 40rpx 40rpx;
+  /* 原图是很淡的对角渐变:右上偏淡紫,左下偏淡薄荷 */
+  background: linear-gradient(225deg, #EDEEFF 0%, #FFFFFF 45%, #F7FBFA 72%, #E8F9F3 100%);
+  border-radius: 24rpx;
+  box-shadow: 0 16rpx 48rpx rgba(27, 27, 31, 0.22);
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #727277;
+}
+
+.tick {
+  position: relative;
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 12rpx;
+  background: #3451B2;
+  border-radius: 8rpx;
+}
+
+.tick::before {
+  content: '';
+  position: absolute;
+  left: 10rpx;
+  top: 7rpx;
+  width: 8rpx;
+  height: 14rpx;
+  border-right: 3rpx solid #FFFFFF;
+  border-bottom: 3rpx solid #FFFFFF;
+  transform: rotate(45deg);
+  box-sizing: border-box;
+}
+
+.headline {
+  margin-top: 28rpx;
+  font-size: 46rpx;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: #1B1B1F;
+}
+
+.headline .em {
+  color: #3451B2;
+}
+
+.sub {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: #66666C;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 28rpx;
+}
+
+.tag {
+  min-height: 52rpx;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 12rpx 12rpx 0;
+  padding: 0 20rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+}
+
+/* ---- 位图模式 ---- */
+
+.pic {
+  display: block;
+  border-radius: 20rpx;
+  background: #FFFFFF;
+}
+
+/* ---- 关闭按钮放在内容下方,不遮挡内容 ---- */
+
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88rpx;
+  height: 88rpx;
+  margin-top: 32rpx;
+  border: 3rpx solid #FFFFFF;
+  border-radius: 50%;
+  color: #FFFFFF;
+}
+
+.close:active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.ic-x {
+  position: relative;
+  display: block;
+  width: 32rpx;
+  height: 32rpx;
+  color: currentColor;
+}
+
+.ic-x::before,
+.ic-x::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 28rpx;
+  height: 4rpx;
+  background: currentColor;
+  border-radius: 2rpx;
+}
+
+.ic-x::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.ic-x::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* 刻意不做深色模式改写:这张卡片是设计图的 1:1 还原,
+   配色一旦跟着系统变,就不是原图了。遮罩本身够暗,不至于刺眼。 */
+
+/* 点击反馈:公告图可点跳转时压暗。遮罩不加 —— 点遮罩的反馈就是弹窗关闭本身 */
+.pic:active {
+  opacity: 0.92;
+}

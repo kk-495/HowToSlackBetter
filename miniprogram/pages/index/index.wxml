@@ -1,0 +1,275 @@
+<view class="topbar">
+  <view class="search-wrap">
+    <view class="searchbox">
+      <view class="ic ic-search"></view>
+      <input
+        class="search-input"
+        placeholder="搜索 {{total}} 条建议:{{hotWords[0]}}、{{hotWords[1]}}、{{hotWords[2]}}"
+        placeholder-class="search-ph"
+        value="{{query}}"
+        confirm-type="search"
+        maxlength="30"
+        bindfocus="onFocus"
+        bindblur="onBlur"
+        bindconfirm="onConfirm"
+        bindinput="onQuery"
+      />
+      <view wx:if="{{query}}" class="ic ic-close" catchtap="onClear"></view>
+    </view>
+
+    <!-- 聚焦且没输入时展开:最近搜索 + 热词 -->
+    <view class="search-panel" wx:if="{{searchFocused && !query}}">
+      <block wx:if="{{history.length}}">
+        <view class="sp-head">
+          <text>最近搜索</text>
+          <text class="sp-clear" catchtap="onClearHistory">清空</text>
+        </view>
+        <view class="sp-chips">
+          <view
+            wx:for="{{history}}"
+            wx:key="*this"
+            class="chip"
+            data-w="{{item}}"
+            catchtap="onTapHistory"
+          >
+            <text class="sp-word">{{item}}</text>
+            <view class="ic ic-close sp-del" data-w="{{item}}" catchtap="onRemoveHistory"></view>
+          </view>
+        </view>
+      </block>
+
+      <view class="sp-head">
+        <text>试试这些</text>
+      </view>
+      <view class="sp-chips">
+        <view
+          wx:for="{{hotWords}}"
+          wx:key="*this"
+          class="chip chip-hot"
+          data-w="{{item}}"
+          catchtap="onTapHot"
+        >{{item}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="chips">
+    <view class="chip {{filter === 'A' ? 'on' : ''}}" data-f="A" bindtap="onFilter">只看 A 级证据</view>
+    <view class="chip {{filter === 'all' ? 'on' : ''}}" data-f="all" bindtap="onFilter">全部</view>
+  </view>
+</view>
+
+<!-- 搜索结果 -->
+<view class="wrap with-tabbar" wx:if="{{mode !== 'home'}}">
+  <view class="c-count" wx:if="{{mode === 'search'}}">
+    找到 {{resultCount}} 条<text wx:if="{{resultCount > results.length}}"> · 已显示 {{results.length}} 条,继续下滑加载</text>
+  </view>
+  <!-- 搜「的」这类常见字会命中全书,提醒一下比让用户自己发现好 -->
+  <view class="c-hint" wx:if="{{mode === 'search' && tooBroad}}">
+    结果太宽泛,换个更具体的词试试,比如「工伤」「租房」「血压」
+  </view>
+
+  <!-- 列表一律「扁平行 + 发丝线」,不再一屏 100 张浮动卡 -->
+  <view class="ed-list" wx:if="{{results.length}}">
+    <view
+      wx:for="{{results}}"
+      wx:key="id"
+      class="ed-item"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="ei-head">
+        <text class="badge {{item.level === 'A' ? 'a' : (item.level === 'B' ? 'b' : 'c')}}">{{item.level}}</text>
+        <view class="ei-title">
+          <block wx:for="{{item.titleSeg}}" wx:for-item="seg" wx:key="index">
+            <text wx:if="{{seg.hit}}" class="hl">{{seg.text}}</text>
+            <text wx:else>{{seg.text}}</text>
+          </block>
+        </view>
+      </view>
+      <view class="ei-sub">{{item.section}} · {{item.sourceCount}} 条来源<text wx:if="{{item.read}}" class="read-tag"> · 已读</text></view>
+      <view class="plain" wx:if="{{item.plain}}">{{item.plain}}</view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{mode === 'empty'}}">
+    <view class="empty-title">没找到「{{query}}」相关的内容</view>
+    <view class="empty-sub">换个说法试试,或者点下面这些</view>
+    <view class="empty-hot">
+      <view
+        class="chip"
+        wx:for="{{hotWords}}"
+        wx:key="*this"
+        data-w="{{item}}"
+        bindtap="onTapHot"
+      >{{item}}</view>
+    </view>
+  </view>
+</view>
+
+<!-- 首页:三幕式(今日 → 新手必看 → 怎么找) -->
+<view class="wrap with-tabbar" wx:else>
+  <!-- 信任条:把「675 条建议 · 1713 条原始文献」从页脚提到首屏可见处 -->
+  <view class="trust-line">
+    <text class="tl-strong">{{total}} 条建议</text><text class="tl-dot">·</text>{{sourceCount}} 条原始文献<text class="tl-dot">·</text>每条都能查到出处
+  </view>
+
+  <!-- 幕一 · 今日:全页唯一浮起元素 -->
+  <view class="hero" data-id="{{daily.item.id}}" bindtap="goDetail">
+    <view class="kicker"><view class="tick"></view>今日一条 · {{todayLabel}}</view>
+    <view class="t-title">{{daily.item.title}}</view>
+    <view class="meta">{{daily.section}}<text class="dot">·</text>证据 {{daily.item.level}}<text class="dot">·</text>性价比 {{daily.item.tier}}</view>
+    <view class="cost">{{daily.item.costTag}}</view>
+
+    <!-- 两个动作放卡片底部:分享降为文字,换一条是唯一主按钮 -->
+    <view class="t-actions">
+      <view class="share-slot">
+        <view class="share-visual">
+          <view class="ic ic-share">
+            <view class="shaft"></view>
+            <view class="head"></view>
+          </view>
+          <text>分享给家人</text>
+        </view>
+        <button
+          class="share-hit"
+          data-share="daily"
+          open-type="share"
+          catchtap="noop"
+        ></button>
+      </view>
+      <view class="btn-shuffle" catchtap="onAnother">换一条</view>
+    </view>
+  </view>
+
+  <!-- 今天再看两条:一条太少形不成习惯,三条且来自不同章节 -->
+  <view class="more-list" wx:if="{{dailyMore.length}}">
+    <view
+      class="more-row"
+      wx:for="{{dailyMore}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="mr-body">
+        <view class="mr-title">{{item.title}}</view>
+        <view class="mr-sub">{{item.section}} · {{item.level}} 级证据</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 幕二 · 新手必看 Top 10:用数据算出来的入门清单,解决「675 条不知道从哪开始」 -->
+  <view class="act-head">
+    <text class="zh">新手必看 Top 10</text>
+    <text class="en">Editor's picks</text>
+  </view>
+  <view class="ed-pick">
+    <view
+      class="ed-row"
+      wx:for="{{picksPreview}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="ed-num">{{item.no}}</view>
+      <view class="ed-body">
+        <view class="ed-t">{{item.title}}</view>
+        <view class="ed-m">{{item.section}} · 证据 {{item.level}} · {{item.sourceCount}} 条来源</view>
+      </view>
+    </view>
+  </view>
+  <view class="ed-more" bindtap="goPicks">查看全部 10 条,每条都写明成本与出处 ›</view>
+
+  <!-- 最近在看(本地记录,不上传) -->
+  <view class="row-head">
+    <text>最近在看</text>
+    <view class="link" bindtap="goFav">
+      <text>我的收藏{{favCount ? ' ' + favCount : ''}}</text>
+      <view class="ic ic-arrow"></view>
+    </view>
+  </view>
+  <scroll-view class="recent-scroll" scroll-x wx:if="{{recent.length}}">
+    <view
+      wx:for="{{recent}}"
+      wx:key="id"
+      class="recent-card"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="rc-title">{{item.title}}</view>
+      <view class="rc-sub">{{item.section}}</view>
+    </view>
+  </scroll-view>
+  <view class="c-count" wx:else>还没有阅读记录</view>
+
+  <!-- 幕三 · 怎么找:主题/阶段合并,章节列表去壳 -->
+  <view class="act-head">
+    <text class="zh">怎么找</text>
+    <text class="en">Browse</text>
+  </view>
+
+  <view class="find-group">
+    <view class="find-line">
+      <text class="lbl">按主题</text>
+      <text class="sep">/</text>
+      <text class="lbl2">按人生阶段</text>
+    </view>
+    <scroll-view class="tag-scroll" scroll-x>
+      <view
+        class="tag-chip"
+        wx:for="{{topicList}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goTopic"
+      >{{item.name}}</view>
+    </scroll-view>
+    <scroll-view class="tag-scroll" scroll-x>
+      <view
+        class="tag-chip tag-chip-stage"
+        wx:for="{{stageList}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goTopic"
+      >{{item.name}}</view>
+    </scroll-view>
+  </view>
+
+  <view class="find-group find-chapters">
+    <view class="find-line">
+      <text class="lbl">按章节</text>
+      <text class="en-mini">34 CHAPTERS · {{total}} NOTES</text>
+    </view>
+    <view class="sec-list">
+      <view
+        class="sec-item"
+        wx:for="{{sections}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goSection"
+      >
+        <view class="cn">{{item.no}}</view>
+        <view class="sb">
+          <view class="st">{{item.title}}</view>
+          <view class="sc">{{item.count}} 条</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    内容源自开源项目《高性价比人生指南》(Unlicense 公有领域)<br/>仅作整理展示,不构成医疗、投资或法律建议
+  </view>
+</view>
+
+<view class="to-top" wx:if="{{showTop}}" bindtap="backToTop">
+  <view class="ic ic-up"></view>
+</view>
+
+<launch-popup
+  show="{{noticeShow}}"
+  mode="{{notice.mode}}"
+  image="{{notice.image}}"
+  width-ratio="{{notice.widthRatio}}"
+  link="{{notice.link}}"
+  bind:close="onCloseNotice"
+/>
